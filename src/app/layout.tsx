@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import AuthContext from "@/components/AuthContext";
+import UserBadge from "@/components/UserBadge";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -15,8 +17,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
-    </html>
+    <AuthContext>
+      <html lang="en">
+        <body className={inter.className}>
+          <UserBadge />
+          {children}
+        </body>
+      </html>
+    </AuthContext>
   );
 }
