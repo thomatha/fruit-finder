@@ -23,8 +23,8 @@ export default function FruitMap({ token }) {
       <Map
         mapboxAccessToken={token}
         initialViewState={{
-          longitude: state.longitude || 44.56197, // OSU :-)
-          latitude: state.latitude || -123.282256,
+          longitude: state.longitude,
+          latitude: state.latitude,
           zoom: 16,
         }}
         // TODO - make height fill view port:
@@ -35,10 +35,7 @@ export default function FruitMap({ token }) {
             : "mapbox://styles/mapbox/satellite-streets-v12"
         }
       >
-        <Marker
-          longitude={state.longitude || 44.56197}
-          latitude={state.latitude || -123.282256}
-        />
+        <Marker longitude={state.longitude} latitude={state.latitude} />
       </Map>
 
       <div className="navbar bg-white fixed bottom-0 z-10">
