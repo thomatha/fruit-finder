@@ -10,7 +10,8 @@ export default function FruitMap({ token }) {
   const [isStreet, setIsStreet] = useState(true);
 
   if (state.loading) {
-    return <p>loading... (you may need to enable permissions)</p>;
+    // TODO show spinner or loading indicator
+    return <p>Loading... (you may need to enable permissions)</p>;
   }
 
   if (state.error) {
@@ -19,37 +20,45 @@ export default function FruitMap({ token }) {
 
   return (
     <>
-      <div className="mb-2">
-        <button
-          className={`btn btn-sm mr-2 ${isStreet ? "btn-active" : ""}`}
-          onClick={() => setIsStreet(true)}
-        >
-          Street
-        </button>
-        <button
-          className={`btn btn-sm ${isStreet ? "" : "btn-active"}`}
-          onClick={() => setIsStreet(false)}
-        >
-          Satellite
-        </button>
-      </div>
       <Map
         mapboxAccessToken={token}
         initialViewState={{
-          longitude: state.longitude,
-          latitude: state.latitude,
+          longitude: state.longitude || 44.56197, // OSU :-)
+          latitude: state.latitude || -123.282256,
           zoom: 16,
         }}
         // TODO - make height fill view port:
-        style={{ height: "90vh" }}
+        style={{ height: "88vh" }}
         mapStyle={
           isStreet
             ? "mapbox://styles/mapbox/streets-v12"
             : "mapbox://styles/mapbox/satellite-streets-v12"
         }
       >
-        <Marker longitude={state.longitude} latitude={state.latitude} />
+        <Marker
+          longitude={state.longitude || 44.56197}
+          latitude={state.latitude || -123.282256}
+        />
       </Map>
+
+      <div className="navbar bg-white fixed bottom-0 z-10">
+        <div className="navbar-start"></div>
+        <div className="navbar-center"></div>
+        <div className="navbar-end">
+          <button
+            className={`btn btn-sm mr-2 ${isStreet ? "btn-active" : ""}`}
+            onClick={() => setIsStreet(true)}
+          >
+            Street
+          </button>
+          <button
+            className={`btn btn-sm ${isStreet ? "" : "btn-active"}`}
+            onClick={() => setIsStreet(false)}
+          >
+            Satellite
+          </button>
+        </div>
+      </div>
     </>
   );
 }
