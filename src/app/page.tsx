@@ -1,7 +1,5 @@
-import FruitMap from "@/components/FruitMap";
-
-const TOKEN = process.env.MAPBOX_TOKEN;
+import Image from "next/image";
 
 export default function Home() {
-  return <FruitMap token={TOKEN} />;
+  return <h1>HOME PAGE FOR FRUIT FINDER</h1>;
 }
