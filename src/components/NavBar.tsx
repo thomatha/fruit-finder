@@ -19,6 +19,7 @@ const NavBar = () => {
             <ul className="p-2 bg-base-100 rounded-t-none">
               <li><a>Sign In</a></li>
               <li><a href='/Register'>Create New Account</a></li>
+              <li><a href='/Fruits'>View Fruit Map</a></li>
             </ul>
           </details>
         </li>
