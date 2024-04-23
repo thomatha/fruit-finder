@@ -24,9 +24,11 @@ const RegisterForm: NextPage = () => {
     // response handler, can update if neccessary 
     const data = await res.json()
     // .....
-    } catch (error) {
-    setError(error.message)
-    console.error(error)
+    } catch (error: unknown) {
+      if (typeof error === "string") {
+        setError(error)
+        console.error(error)
+      }
   }
     
   }
