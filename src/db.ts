@@ -1,3 +1,6 @@
+/* 
+This file is deprecated - establishes a connection to AWS DB 
+
 const { Pool } = require('pg');
 
 export const pool = new Pool({
@@ -11,3 +14,5 @@ export const pool = new Pool({
         rejectUnauthorized: false
     }
 });
+
+*/
