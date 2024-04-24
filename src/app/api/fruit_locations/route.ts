@@ -1,7 +1,7 @@
 import { sql } from '@vercel/postgres';
 import { NextResponse } from 'next/server';
 
-// Fetch endpoint for fetching fruit tree location data
+// GET endpoint for fetching fruit tree location data
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
@@ -198,7 +198,7 @@ export async function GET(request: Request) {
 }
 
 
-// Post endpoint for creating a new fruit tree location
+// POST endpoint for creating a new fruit tree location
 export async function POST(request: Request) {
     const data = await request.json();
 
@@ -221,7 +221,7 @@ export async function POST(request: Request) {
 }
 
 
-// Put endpoint for updating a fruit tree location
+// PUT endpoint for updating a fruit tree location
 export async function PUT(request: Request) {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
@@ -268,7 +268,7 @@ export async function PUT(request: Request) {
 }
 
 
-// Delete endpoint for deleting fruit tree location data
+// DELETE endpoint for deleting fruit tree location data
 export async function DELETE(request: Request) {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
@@ -311,7 +311,7 @@ export async function DELETE(request: Request) {
     TESTING CODE:
     (Currently, don't know how to make Postman play nice with Auth0)
     (But it is possible to test the endpoints by simply calling the fetch API from within your browser)
-    (After running one of these in the browser console, you can check results at http://localhost:3000/api/fruit_locations?all=1)
+    (After running one in the browser console, you can check results by refreshing http://localhost:3000/api/fruit_locations?all=1)
 
     // Test POST request:
     fetch('http://localhost:3000/api/fruit_locations', { 
