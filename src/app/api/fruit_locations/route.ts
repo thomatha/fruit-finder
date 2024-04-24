@@ -1,5 +1,3 @@
-// TODO: We need to establish a postgres SQL db on Vercel before these endpoints would work.
-
 import { sql } from '@vercel/postgres';
 import { NextResponse } from 'next/server';
 
@@ -12,10 +10,8 @@ export async function GET(request: Request) {
     const radius = searchParams.get('radius');
     const fruitId = searchParams.get('fruit_id');
     const all = searchParams.get('all');
-    console.log(searchParams);
-    console.log(all);
 
-    // Todo: Figure out what these boundary variables are actually called, when passed from the frontend
+    // TODO: Figure out what these boundary variables are actually named, when passed from the frontend
     const latitude_boundary_east = searchParams.get('latitude_boundary_east');
     const latitude_boundary_west = searchParams.get('latitude_boundary_west');
     const longitude_boundary_north = searchParams.get('longitude_boundary_north');
@@ -174,7 +170,6 @@ export async function GET(request: Request) {
                     WHERE f.id = ${fruitId};
                 `;
             } catch(e) {
-                console.log(e);
                 return NextResponse.json({ error: 'An error occurred when fetching fruit tree locations' }, { status: 500 });
             }
         } else {
@@ -192,7 +187,6 @@ export async function GET(request: Request) {
                         fruits f ON ftl.fruit_id = f.id;
                 `;
             } catch(e) {
-                console.log(e);
                 return NextResponse.json({ error: 'An error occurred when fetching fruit tree locations' }, { status: 500 });
             }
         }
