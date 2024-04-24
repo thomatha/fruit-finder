@@ -11,7 +11,7 @@ export async function GET(request: Request) {
             FROM 
                 fruits f;
         `;
-        return NextResponse.json({ fruitList }, { status: 200 });
+        return NextResponse.json( fruitList.rows, { status: 200 });
     } catch(e) {
         return NextResponse.json('An error occurred when fetching fruit list', { status: 500 });
     }
