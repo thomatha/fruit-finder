@@ -211,7 +211,7 @@ export async function POST(request: Request) {
             INSERT INTO fruit_tree_locations 
                 (name, latitude, longitude, fruit_id)
             VALUES 
-                ('${data.name}', ${data.latitude}, ${data.longitude}, ${data.fruit_id});
+                (${data.name}, ${data.latitude}, ${data.longitude}, ${data.fruit_id});
         `;
     } catch(e) {
         return NextResponse.json({ error: 'An error occurred when creating fruit tree location' }, { status: 500 });
@@ -225,24 +225,43 @@ export async function POST(request: Request) {
 export async function PUT(request: Request) {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
+    const latest = searchParams.get('latest');
     const data = await request.json();
 
-    if(!id || !data || !data.name || !data.latitude || !data.longitude || !data.fruit_id) {
+    if(!(id || latest) || !data || !data.name || !data.latitude || !data.longitude || !data.fruit_id) {
         return NextResponse.json({ error: 'The request body is missing at least one of the required attributes' }, { status: 400 });
     }
 
-    try {
-        await sql`
-            UPDATE fruit_tree_locations
-            SET 
-                name = '${data.name}',
-                latitude = ${data.latitude},
-                longitude = ${data.longitude},
-                fruit_id = ${data.fruit_id}
-            WHERE id = ${id};
-        `;
-    } catch(e) {
-        return NextResponse.json({ error: 'An error occurred when updating fruit tree location' }, { status: 500 });
+    if(id) {
+        try {
+            await sql`
+                UPDATE fruit_tree_locations
+                SET 
+                    name = ${data.name},
+                    latitude = ${data.latitude},
+                    longitude = ${data.longitude},
+                    fruit_id = ${data.fruit_id}
+                WHERE id = ${id};
+            `;
+        } catch(e) {
+            return NextResponse.json({ error: 'An error occurred when updating fruit tree location' }, { status: 500 });
+        }
+    } else {
+        try {
+            await sql`
+                UPDATE fruit_tree_locations
+                SET 
+                    name = ${data.name},
+                    latitude = ${data.latitude},
+                    longitude = ${data.longitude},
+                    fruit_id = ${data.fruit_id}
+                WHERE id IN (
+                    SELECT id FROM fruit_tree_locations ORDER BY id DESC LIMIT 1
+                );
+            `;
+        } catch(e) {
+            return NextResponse.json({ error: 'An error occurred when updating fruit tree location' }, { status: 500 });
+        }
     }
 
     return NextResponse.json({ }, { status: 200 });
@@ -253,21 +272,75 @@ export async function PUT(request: Request) {
 export async function DELETE(request: Request) {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
+    const latest = searchParams.get('latest');
 
-    if(!id) {
+    if(!id && !latest) {
         return NextResponse.json({ error: 'The request body is missing at least one of the required attributes' }, { status: 400 });
     }
     
-    try {
-        await sql`
-            DELETE FROM 
-                fruit_tree_locations 
-            WHERE 
-                id = ${id};
-        `;
-    } catch(e) {
-        return NextResponse.json({ error: 'An error occurred when deleting fruit tree location' }, { status: 500 });
+    if(id) {
+        try {
+            await sql`
+                DELETE FROM 
+                    fruit_tree_locations 
+                WHERE 
+                    id = ${id};
+            `;
+        } catch(e) {
+            return NextResponse.json({ error: 'An error occurred when deleting fruit tree location' }, { status: 500 });
+        }
+    } else {
+        try {
+            await sql`
+                DELETE FROM 
+                    fruit_tree_locations 
+                WHERE 
+                    id IN (
+                        SELECT id FROM fruit_tree_locations ORDER BY id DESC LIMIT 1
+                    );
+            `;
+        } catch(e) {
+            return NextResponse.json({ error: 'An error occurred when deleting fruit tree location' }, { status: 500 });
+        }
     }
 
-    return NextResponse.json({ }, { status: 204 });
+    return NextResponse.json({ }, { status: 200 });
 }
+
+/*
+    TESTING CODE:
+    (Currently, don't know how to make Postman play nice with Auth0)
+    (But it is possible to test the endpoints by simply calling the fetch API from within your browser)
+    (After running one of these in the browser console, you can check results at http://localhost:3000/api/fruit_locations?all=1)
+
+    // Test POST request:
+    fetch('http://localhost:3000/api/fruit_locations', { 
+        method: "POST",
+        headers: {
+        "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            name: 'Oregon state university - test location',
+            latitude: 44.565296,
+            longitude: -123.276016,
+            fruit_id: 3
+        })
+    })
+
+    // Test PUT request:
+    fetch('http://localhost:3000/api/fruit_locations?latest=1', { 
+        method: "PUT",
+        headers: {
+        "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            name: 'Oregon state university - test location, now updated!',
+            latitude: 44.565296,
+            longitude: -123.276016,
+            fruit_id: 3
+        })
+    })
+
+    // Test DELETE request:
+    fetch('http://localhost:3000/api/fruit_locations?latest=1', { method: "DELETE" })
+*/
