@@ -34,8 +34,8 @@ const RegisterForm: NextPage = () => {
   }
 
   return (
-    <div>
-      
+    
+    <div className="mx-auto text-center">  
       <form onSubmit={onSubmit}>
         <label className="input input-bordered flex items-center gap-2">
           <input type="text" name="firstName" autoComplete="First Name" placeholder="First Name:" className="grow" />
