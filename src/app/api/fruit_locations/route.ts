@@ -154,8 +154,8 @@ export async function GET(request: Request) {
                         fruit_tree_locations ftl
                     LEFT JOIN 
                         fruits f ON ftl.fruit_id = f.id
-                    WHERE ftl.latitude BETWEEN ${west} AND ${east}
-                    AND ftl.longitude BETWEEN ${south} AND ${north}
+                    WHERE ftl.latitude BETWEEN ${south} AND ${north}
+                    AND ftl.longitude BETWEEN ${west} AND ${east}
                     AND f.id = ${fruitId};
                 `;
             } catch(e) {
@@ -177,8 +177,8 @@ export async function GET(request: Request) {
                         fruit_tree_locations ftl
                     LEFT JOIN 
                         fruits f ON ftl.fruit_id = f.id
-                    WHERE ftl.latitude BETWEEN ${west} AND ${east}
-                    AND ftl.longitude BETWEEN ${south} AND ${north};
+                    WHERE ftl.latitude BETWEEN ${south} AND ${north}
+                    AND ftl.longitude BETWEEN ${west} AND ${east};
                 `;
             } catch(e) {
                 return NextResponse.json({ error: 'An error occurred when fetching fruit tree locations' }, { status: 500 });
