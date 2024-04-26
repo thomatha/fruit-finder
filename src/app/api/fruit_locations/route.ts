@@ -1,7 +1,31 @@
 import { sql } from '@vercel/postgres';
 import { NextResponse } from 'next/server';
 
-// GET endpoint for fetching fruit tree location data
+/**
+ * GET endpoint for fetching fruit tree location data. All properties are URL search parameters
+ * 
+ * Option 1 - Get a specific fruit tree location
+ * @property  {int} id the unique id of a specific fruit tree location
+ * 
+ * For the rest of the options, can include an optional fruit type filter:
+ * @property  {int} fruit_id the unique id of a fruit type
+ * 
+ * Option 2 - Get all fruit tree locations within a radius of a specified point
+ * @property  {float} latitude the latitude of the chosen point
+ * @property  {float} longitude the longitude of the chosen point
+ * @property  {float} radius the radius around the point to fetch fruit trees (miles by default)
+ * 
+ * Option 3 - Get all fruit tree locations within a bounding box
+ * @property  {float} east the eastern side of the box
+ * @property  {float} west the western side of the box
+ * @property  {float} north the northern side of the box
+ * @property  {float} south the southern side of the box
+ * 
+ * Option 4 - Get all fruit tree locations
+ * @property  {int} all If this parameter exists, fetch all fruit tree locations
+ * 
+ * @return {FruitTreeLocation[]} the list of fruit tree location records 
+ */
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
@@ -11,11 +35,10 @@ export async function GET(request: Request) {
     const fruitId = searchParams.get('fruit_id');
     const all = searchParams.get('all');
 
-    // TODO: Figure out what these boundary variables are actually named, when passed from the frontend
-    const latitude_boundary_east = searchParams.get('latitude_boundary_east');
-    const latitude_boundary_west = searchParams.get('latitude_boundary_west');
-    const longitude_boundary_north = searchParams.get('longitude_boundary_north');
-    const longitude_boundary_south = searchParams.get('longitude_boundary_south');
+    const east = searchParams.get('east');
+    const west = searchParams.get('west');
+    const north = searchParams.get('north');
+    const south = searchParams.get('south');
 
     let fruitTreeLocations = null;
 
@@ -24,9 +47,12 @@ export async function GET(request: Request) {
         try {
             fruitTreeLocations = await sql`
                 SELECT 
-                    ftl.name AS fruit_tree_name, 
+                    ftl.id,
+                    ftl.name AS fruit_tree_name,
+                    ftl.description, 
                     ftl.latitude, 
                     ftl.longitude, 
+                    ftl.s3_img_link,
                     f.name AS fruit_name, 
                     f.color 
                 FROM 
@@ -53,6 +79,7 @@ export async function GET(request: Request) {
                 fruitTreeLocations = await sql`
                     SELECT * FROM (
                         SELECT 
+                            ftl.id,
                             ftl.name AS fruit_tree_name, 
                             ftl.latitude, 
                             ftl.longitude, 
@@ -84,6 +111,7 @@ export async function GET(request: Request) {
                 fruitTreeLocations = await sql`
                     SELECT * FROM (
                         SELECT 
+                            ftl.id,
                             ftl.name AS fruit_tree_name, 
                             ftl.latitude, 
                             ftl.longitude, 
@@ -110,12 +138,13 @@ export async function GET(request: Request) {
                 return NextResponse.json({ error: 'An error occurred when fetching fruit tree locations' }, { status: 500 });
             }
         }
-    } else if(latitude_boundary_east && latitude_boundary_west && longitude_boundary_north && longitude_boundary_south) {
+    } else if(east && west && north && south) {
         // Fetch all fruit tree locations within a specified bounding box
         if(fruitId) {
             try {
                 fruitTreeLocations = await sql`
                     SELECT 
+                        ftl.id,
                         ftl.name AS fruit_tree_name, 
                         ftl.latitude, 
                         ftl.longitude, 
@@ -125,8 +154,8 @@ export async function GET(request: Request) {
                         fruit_tree_locations ftl
                     LEFT JOIN 
                         fruits f ON ftl.fruit_id = f.id
-                    WHERE ftl.latitude BETWEEN ${latitude_boundary_east} AND ${latitude_boundary_west}
-                    AND ftl.longitude BETWEEN ${longitude_boundary_north} AND ${longitude_boundary_south}
+                    WHERE ftl.latitude BETWEEN ${west} AND ${east}
+                    AND ftl.longitude BETWEEN ${south} AND ${north}
                     AND f.id = ${fruitId};
                 `;
             } catch(e) {
@@ -136,17 +165,20 @@ export async function GET(request: Request) {
             try {
                 fruitTreeLocations = await sql`
                     SELECT 
+                        ftl.id,
                         ftl.name AS fruit_tree_name, 
+                        ftl.description, 
                         ftl.latitude, 
                         ftl.longitude, 
+                        ftl.s3_img_link, 
                         f.name AS fruit_name, 
                         f.color 
                     FROM 
                         fruit_tree_locations ftl
                     LEFT JOIN 
                         fruits f ON ftl.fruit_id = f.id
-                    WHERE ftl.latitude BETWEEN ${latitude_boundary_east} AND ${latitude_boundary_west}
-                    AND ftl.longitude BETWEEN ${longitude_boundary_north} AND ${longitude_boundary_south};
+                    WHERE ftl.latitude BETWEEN ${west} AND ${east}
+                    AND ftl.longitude BETWEEN ${south} AND ${north};
                 `;
             } catch(e) {
                 return NextResponse.json({ error: 'An error occurred when fetching fruit tree locations' }, { status: 500 });
@@ -158,6 +190,7 @@ export async function GET(request: Request) {
             try {
                 fruitTreeLocations = await sql`
                     SELECT 
+                        ftl.id,
                         ftl.name AS fruit_tree_name, 
                         ftl.latitude, 
                         ftl.longitude, 
@@ -176,6 +209,7 @@ export async function GET(request: Request) {
             try {
                 fruitTreeLocations = await sql`
                     SELECT 
+                        ftl.id,
                         ftl.name AS fruit_tree_name, 
                         ftl.latitude, 
                         ftl.longitude, 
@@ -199,6 +233,7 @@ export async function GET(request: Request) {
 
 
 // POST endpoint for creating a new fruit tree location
+// TODO - expand this comment into more descriptive JSDoc
 export async function POST(request: Request) {
     const data = await request.json();
 
@@ -206,15 +241,29 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'The request body is missing at least one of the required attributes' }, { status: 400 });
     }
 
-    try {
-        await sql`
-            INSERT INTO fruit_tree_locations 
-                (name, latitude, longitude, fruit_id)
-            VALUES 
-                (${data.name}, ${data.latitude}, ${data.longitude}, ${data.fruit_id});
-        `;
-    } catch(e) {
-        return NextResponse.json({ error: 'An error occurred when creating fruit tree location' }, { status: 500 });
+    if(!data.description && !data.s3_img_link) {
+        try {
+            await sql`
+                INSERT INTO fruit_tree_locations 
+                    (name, latitude, longitude, fruit_id)
+                VALUES 
+                    (${data.name}, ${data.latitude}, ${data.longitude}, ${data.fruit_id});
+            `;
+        } catch(e) {
+            return NextResponse.json({ error: 'An error occurred when creating fruit tree location' }, { status: 500 });
+        }
+    } else {
+        // For now, for simplicity's sake, we assume that if one optional field is present, all are
+        try {
+            await sql`
+                INSERT INTO fruit_tree_locations 
+                    (name, description, latitude, longitude, s3_img_link, fruit_id)
+                VALUES 
+                    (${data.name}, ${data.description}, ${data.latitude}, ${data.longitude}, ${data.s3_img_link}, ${data.fruit_id});
+            `;
+        } catch(e) {
+            return NextResponse.json({ error: 'An error occurred when creating fruit tree location' }, { status: 500 });
+        }
     }
 
     return NextResponse.json({ }, { status: 201 });
@@ -222,6 +271,7 @@ export async function POST(request: Request) {
 
 
 // PUT endpoint for updating a fruit tree location
+// TODO - expand this comment into more descriptive JSDoc
 export async function PUT(request: Request) {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
@@ -268,7 +318,13 @@ export async function PUT(request: Request) {
 }
 
 
-// DELETE endpoint for deleting fruit tree location data
+/**
+ * DELETE endpoint for deleting fruit tree location data. All properties are URL search parameters
+ * @property  {int} id the unique id of a specific fruit tree location
+ * @property  {int} latest if this parameter exists, delete the latest added fruit tree location
+ * 
+ * @return { } no records
+ */
 export async function DELETE(request: Request) {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
