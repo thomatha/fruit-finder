@@ -3,10 +3,14 @@
 import { useState } from "react";
 import { useGeolocation } from "@uidotdev/usehooks";
 import Map, { Marker } from "react-map-gl";
+import useNearbyFruits from "@/hooks/useNearbyFruits";
 import "mapbox-gl/dist/mapbox-gl.css";
+import { FruitLocation } from "@/types";
+import fruitIcon from "@/utils/fruitIcon";
 
 export default function FruitMap({ token }) {
   const state = useGeolocation();
+  const [fruits] = useNearbyFruits();
   const [isStreet, setIsStreet] = useState(true);
 
   if (state.loading) {
@@ -35,6 +39,24 @@ export default function FruitMap({ token }) {
             : "mapbox://styles/mapbox/satellite-streets-v12"
         }
       >
+        {fruits.map((fruitLocation: FruitLocation) => (
+          <>
+            <Marker
+              key={fruitLocation.id}
+              latitude={fruitLocation.latitude}
+              longitude={fruitLocation.longitude}
+              color="white"
+            />
+            <Marker
+              key={fruitLocation.id}
+              latitude={fruitLocation.latitude}
+              longitude={fruitLocation.longitude}
+              offset={[0, -20]}
+            >
+              <span className="text-xl">{fruitIcon(fruitLocation.fruit)}</span>
+            </Marker>
+          </>
+        ))}
         <Marker longitude={state.longitude} latitude={state.latitude} />
       </Map>
 
