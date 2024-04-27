@@ -3,13 +3,16 @@ import { useEffect, useState } from "react";
 
 function useNearbyFruits() {
   const [fruits, setFruits] = useState<FruitLocation[]>([]);
+  const [south, setSouth] = useState<number>(-90);
+  const [north, setNorth] = useState<number>(90);
+  const [west, setWest] = useState<number>(-180);
+  const [east, setEast] = useState<number>(180);
 
-  // TODO set map bounds
   // This useEffect with empty [] gets called once when the component is created
   useEffect(() => {
     const fetchData = async () => {
       const response = await fetch(
-        "/api/fruit_locations?east=180&west=-180&north=90&south=-90"
+        `/api/fruit_locations?east=${east}&west=${west}&north=${north}&south=${south}`
       );
       const data = await response.json();
 
@@ -26,9 +29,16 @@ function useNearbyFruits() {
       setFruits(fruitData);
     };
     fetchData();
-  }, []);
+  }, [east, north, south, west]);
 
-  return [fruits];
+  const setBounds = (n: number, e: number, w: number, s: number) => {
+    setNorth(n);
+    setEast(e);
+    setWest(w);
+    setSouth(s);
+  };
+
+  return [fruits, setBounds];
 }
 
 export default useNearbyFruits;
