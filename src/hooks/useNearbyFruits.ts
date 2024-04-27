@@ -1,7 +1,12 @@
 import { type FruitLocation } from "@/types";
 import { useEffect, useState } from "react";
 
-function useNearbyFruits() {
+type NearbyFruits = [
+  FruitLocation[],
+  (n: number, e: number, w: number, s: number) => void
+];
+
+function useNearbyFruits(): NearbyFruits {
   const [fruits, setFruits] = useState<FruitLocation[]>([]);
   const [south, setSouth] = useState<number>(-90);
   const [north, setNorth] = useState<number>(90);
