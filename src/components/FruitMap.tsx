@@ -1,12 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useGeolocation } from "@uidotdev/usehooks";
-import Map, { Marker } from "react-map-gl";
+import Map, { Marker, type MapRef } from "react-map-gl";
+import useNearbyFruits from "@/hooks/useNearbyFruits";
 import "mapbox-gl/dist/mapbox-gl.css";
+import { FruitLocation } from "@/types";
+import fruitIcon from "@/utils/fruitIcon";
 
 export default function FruitMap({ token }) {
+  const mapRef = useRef<MapRef>();
   const state = useGeolocation();
+  const [fruits, setBounds] = useNearbyFruits();
   const [isStreet, setIsStreet] = useState(true);
 
   if (state.loading) {
@@ -18,9 +23,20 @@ export default function FruitMap({ token }) {
     return <p>Enable permissions to access your location data</p>;
   }
 
+  const updateBounds = () => {
+    const bounds = mapRef.current?.getBounds();
+    setBounds(
+      bounds?._ne.lat,
+      bounds?._ne.lng,
+      bounds?._sw.lng,
+      bounds?._sw.lat
+    );
+  };
+
   return (
     <>
       <Map
+        ref={mapRef}
         mapboxAccessToken={token}
         initialViewState={{
           longitude: state.longitude,
@@ -34,7 +50,28 @@ export default function FruitMap({ token }) {
             ? "mapbox://styles/mapbox/streets-v12"
             : "mapbox://styles/mapbox/satellite-streets-v12"
         }
+        onDragEnd={updateBounds}
+        onLoad={updateBounds}
+        onZoomEnd={updateBounds}
       >
+        {fruits.map((fruitLocation: FruitLocation) => (
+          <>
+            <Marker
+              key={`${fruitLocation.id}-bg`}
+              latitude={fruitLocation.latitude}
+              longitude={fruitLocation.longitude}
+              color="white"
+            />
+            <Marker
+              key={fruitLocation.id}
+              latitude={fruitLocation.latitude}
+              longitude={fruitLocation.longitude}
+              offset={[0, -20]}
+            >
+              <span className="text-xl">{fruitIcon(fruitLocation.fruit)}</span>
+            </Marker>
+          </>
+        ))}
         <Marker longitude={state.longitude} latitude={state.latitude} />
       </Map>
 
