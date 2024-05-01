@@ -2,6 +2,7 @@ import Image from "next/image";
 import locationImg from '../../public/img/location_icon.png';
 import searchImg from '../../public/img/search_icon.png';
 import treeImg from '../../public/img/tree_icon.png';
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -14,7 +15,7 @@ export default function Home() {
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4 opacity-70"><path fillRule="evenodd" d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z" clipRule="evenodd" /></svg>
             <input type="text" className="grow" placeholder="Search by city, neighborhood, or fruit type" />
           </label>
-          <p className="link py-6 text-base-100 dark:text-white mix-blend-difference">Explore nearby fruit trees</p>
+          <Link href="/fruits" className="flex-center text-base-100 dark:text-white mix-blend-difference hover:underline">Explore nearby fruit trees</Link>
         </div>
       </div>
     </div>
