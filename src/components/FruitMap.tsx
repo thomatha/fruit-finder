@@ -4,15 +4,21 @@ import { useRef, useState } from "react";
 import { useGeolocation } from "@uidotdev/usehooks";
 import Map, { Marker, type MapRef } from "react-map-gl";
 import useNearbyFruits from "@/hooks/useNearbyFruits";
+import useSpecificFruit from "@/hooks/useSpecificFruit";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { FruitLocation } from "@/types";
 import fruitIcon from "@/utils/fruitIcon";
+import SlidingPanel from 'react-sliding-side-panel';
+import Image from 'next/image'
 
 export default function FruitMap({ token }) {
   const mapRef = useRef<MapRef>();
   const state = useGeolocation();
   const [fruits, setBounds] = useNearbyFruits();
   const [isStreet, setIsStreet] = useState(true);
+  const [selectedFruit, setSelectedFruit] = useSpecificFruit();
+  const [openPanel, setOpenPanel] = useState(false);
+  const [panelSection, setPanelSection] = useState(0);
 
   if (state.loading) {
     // TODO show spinner or loading indicator
@@ -33,8 +39,14 @@ export default function FruitMap({ token }) {
     );
   };
 
+  const panelLoad = async (id: number) => {
+    setSelectedFruit(id);
+    setOpenPanel(true);
+  };
+
   return (
     <>
+      <div>
       <Map
         ref={mapRef}
         mapboxAccessToken={token}
@@ -53,6 +65,9 @@ export default function FruitMap({ token }) {
         onDragEnd={updateBounds}
         onLoad={updateBounds}
         onZoomEnd={updateBounds}
+        onDragStart={() => {
+            setOpenPanel(false);
+        }}
       >
         {fruits.map((fruitLocation: FruitLocation) => (
           <>
@@ -67,6 +82,11 @@ export default function FruitMap({ token }) {
               latitude={fruitLocation.latitude}
               longitude={fruitLocation.longitude}
               offset={[0, -20]}
+              // Unsure about this behavior. Could see user wanting to keep panel on screen as they navigate around
+              onClick={() => {
+                setOpenPanel(false);
+                panelLoad(fruitLocation.id);
+              }}
             >
               <span className="text-xl">{fruitIcon(fruitLocation.fruit)}</span>
             </Marker>
@@ -74,6 +94,7 @@ export default function FruitMap({ token }) {
         ))}
         <Marker longitude={state.longitude} latitude={state.latitude} />
       </Map>
+      </div>
 
       <div className="navbar bg-white fixed bottom-0 z-10">
         <div className="navbar-start"></div>
@@ -93,6 +114,49 @@ export default function FruitMap({ token }) {
           </button>
         </div>
       </div>
+      <SlidingPanel
+        type={'left'}
+        isOpen={openPanel}
+        backdropClicked={() => setOpenPanel(false)}
+        size={22}
+        panelClassName=""
+        panelContainerClassName="my-20 bg-base-100"
+        noBackdrop={true}
+      >
+        {/* TODO:
+          * Remove panel close button, or stick it to bottom of panel (with relative positioning?)
+          * Build out review list interface, with each review probably needing username, rating, and comment (optional)
+          * Edit button - probably far easier if this takes user to a route w/ a form. Only visible if user created this location
+          */}
+        <div className="panel-container grid grid-cols-1 gap-4 content-evenly text-center">
+          <Image src={selectedFruit ? selectedFruit.img_link : ''} alt="fruit_tree_image" height={250} width={450}></Image>
+          <div className="px-4 text-start">
+            <div><span className="font-semibold text-lg">{selectedFruit ? selectedFruit.name : ''}</span></div>
+            {/*Reviews average, placeholder until fleshing out that system more*/}
+            <div><span>★★★★</span><span>☆</span></div>
+          </div>
+          <div className="grid grid-cols-2 px-4">
+            <div><button className="btn btn-sm col-span-1" onClick={() => setPanelSection(0)}>Overview</button></div>
+            <div><button className="btn btn-sm col-span-1" onClick={() => setPanelSection(1)}>Reviews</button></div>
+          </div>
+          <div className="text-start px-4">
+          {
+            panelSection === 0 ? 
+              <div>
+                <p>{selectedFruit ? selectedFruit.description : ''}</p>
+              </div> 
+            : 
+              <div>
+                <div>Review list here..?</div>
+              </div>
+          }
+          </div>
+          <button type="button" className="close-button btn btn-sm mx-4 mt-18" onClick={() => setOpenPanel(false)}>
+            Close Panel
+          </button>
+        </div>
+      </SlidingPanel>
+      <div></div>
     </>
   );
 }
