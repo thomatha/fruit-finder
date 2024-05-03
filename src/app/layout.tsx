@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import AuthContext from "@/components/AuthContext";
-import UserBadge from "@/components/UserBadge";
 import NavBar from '@/components/NavBar';
 
 const inter = Inter({ subsets: ["latin"] });
