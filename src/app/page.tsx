@@ -1,3 +1,4 @@
+'use client';
 import Image from "next/image";
 import locationImg from '../../public/img/location_icon.png';
 import searchImg from '../../public/img/search_icon.png';
@@ -59,6 +60,6 @@ export default function Home() {
         </div>
       </div>
       </div>
-
+      
   );
 }
