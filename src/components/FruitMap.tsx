@@ -10,6 +10,7 @@ import { FruitLocation } from "@/types";
 import fruitIcon from "@/utils/fruitIcon";
 import SlidingPanel from 'react-sliding-side-panel';
 import Image from 'next/image'
+import Modal from '../components/ReviewModal'
 
 export default function FruitMap({ token }) {
   const mapRef = useRef<MapRef>();
@@ -19,6 +20,7 @@ export default function FruitMap({ token }) {
   const [selectedFruit, setSelectedFruit] = useSpecificFruit();
   const [openPanel, setOpenPanel] = useState(false);
   const [panelSection, setPanelSection] = useState(0);
+  const [selectedLocation, setSelectedLocation] = useState(0);
 
   if (state.loading) {
     // TODO show spinner or loading indicator
@@ -41,59 +43,66 @@ export default function FruitMap({ token }) {
 
   const panelLoad = async (id: number) => {
     setSelectedFruit(id);
+    setSelectedLocation(id);
     setOpenPanel(true);
+  };
+
+  function reviewModal() {
+    let treeDesc = selectedFruit ? selectedFruit.name : '';
+    document.getElementById("treeModal").innerHTML = treeDesc;
+    (document.getElementById('review_modal') as HTMLDialogElement).showModal();
   };
 
   return (
     <>
       <div>
-      <Map
-        ref={mapRef}
-        mapboxAccessToken={token}
-        initialViewState={{
-          longitude: state.longitude,
-          latitude: state.latitude,
-          zoom: 16,
-        }}
-        // TODO - make height fill view port:
-        style={{ height: "88vh" }}
-        mapStyle={
-          isStreet
-            ? "mapbox://styles/mapbox/streets-v12"
-            : "mapbox://styles/mapbox/satellite-streets-v12"
-        }
-        onDragEnd={updateBounds}
-        onLoad={updateBounds}
-        onZoomEnd={updateBounds}
-        onDragStart={() => {
+        <Map
+          ref={mapRef}
+          mapboxAccessToken={token}
+          initialViewState={{
+            longitude: state.longitude,
+            latitude: state.latitude,
+            zoom: 16,
+          }}
+          // TODO - make height fill view port:
+          style={{ height: "88vh" }}
+          mapStyle={
+            isStreet
+              ? "mapbox://styles/mapbox/streets-v12"
+              : "mapbox://styles/mapbox/satellite-streets-v12"
+          }
+          onDragEnd={updateBounds}
+          onLoad={updateBounds}
+          onZoomEnd={updateBounds}
+          onDragStart={() => {
             setOpenPanel(false);
-        }}
-      >
-        {fruits.map((fruitLocation: FruitLocation) => (
-          <>
-            <Marker
-              key={`${fruitLocation.id}-bg`}
-              latitude={fruitLocation.latitude}
-              longitude={fruitLocation.longitude}
-              color="white"
-            />
-            <Marker
-              key={fruitLocation.id}
-              latitude={fruitLocation.latitude}
-              longitude={fruitLocation.longitude}
-              offset={[0, -20]}
-              // Unsure about this behavior. Could see user wanting to keep panel on screen as they navigate around
-              onClick={() => {
-                setOpenPanel(false);
-                panelLoad(fruitLocation.id);
-              }}
-            >
-              <span className="text-xl">{fruitIcon(fruitLocation.fruit)}</span>
-            </Marker>
-          </>
-        ))}
-        <Marker longitude={state.longitude} latitude={state.latitude} />
-      </Map>
+          }}
+        >
+          {fruits.map((fruitLocation: FruitLocation) => (
+            <>
+              <Marker
+                key={`${fruitLocation.id}-bg`}
+                latitude={fruitLocation.latitude}
+                longitude={fruitLocation.longitude}
+                color="white"
+              />
+              <Marker
+                key={fruitLocation.id} //TODO: this is causing a lot of Warning: Each child in a list should have a unique "key" prop. errors in the log
+                latitude={fruitLocation.latitude}
+                longitude={fruitLocation.longitude}
+                offset={[0, -20]}
+                // Unsure about this behavior. Could see user wanting to keep panel on screen as they navigate around
+                onClick={() => {
+                  setOpenPanel(false);
+                  panelLoad(fruitLocation.id);
+                }}
+              >
+                <span className="text-xl">{fruitIcon(fruitLocation.fruit)}</span>
+              </Marker>
+            </>
+          ))}
+          <Marker longitude={state.longitude} latitude={state.latitude} />
+        </Map>
       </div>
 
       <div className="navbar bg-white fixed bottom-0 z-10">
@@ -140,16 +149,19 @@ export default function FruitMap({ token }) {
             <div><button className="btn btn-sm col-span-1" onClick={() => setPanelSection(1)}>Reviews</button></div>
           </div>
           <div className="text-start px-4">
-          {
-            panelSection === 0 ? 
-              <div>
-                <p>{selectedFruit ? selectedFruit.description : ''}</p>
-              </div> 
-            : 
-              <div>
-                <div>Review list here..?</div>
-              </div>
-          }
+            {
+              panelSection === 0 ?
+                <div>
+                  <p>{selectedFruit ? selectedFruit.description : ''}</p>
+                </div>
+                :
+                <div>
+                  <div>Review list here..?</div>
+                  <div>
+                    <Modal treeId={selectedLocation}/>
+                    <button className="btn" data-treemodal={selectedFruit ? selectedFruit.description : ''} onClick={() => reviewModal()}>Write a Review</button></div>
+                </div>
+            }
           </div>
           <button type="button" className="close-button btn btn-sm mx-4 mt-18" onClick={() => setOpenPanel(false)}>
             Close Panel
