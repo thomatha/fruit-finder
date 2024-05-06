@@ -3,11 +3,16 @@ import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
-    const id = searchParams.get('tree_id');
+    const tree_id = searchParams.get('tree_id');
+    const user_id = searchParams.get('user_id');
 
     let fruitTreeReviews = null;
 
-    if(id) {
+    if(tree_id && user_id) {
+        // Return an error if both parameters are specified
+        return NextResponse.json({ error: 'Bad request. You may only provide one parameter.' }, { status: 400 });
+    }
+    else if(tree_id) {
         // Fetch a specific fruit tree location's reviews
         try {
             fruitTreeReviews = await sql`
@@ -20,7 +25,26 @@ export async function GET(request: Request) {
                 FROM 
                     fruit_tree_reviews ftr
                 WHERE
-                    ftr.tree_id = ${id};
+                    ftr.tree_id = ${tree_id};
+            `;
+        } catch(e) {
+            return NextResponse.json({ error: 'An error occurred when fetching fruit tree reviews.' }, { status: 500 });
+        }
+    } 
+    else if(user_id) {
+        // Fetch a specific fruit tree location's reviews
+        try {
+            fruitTreeReviews = await sql`
+                SELECT 
+                    ftr.id,
+                    ftr.tree_id,
+                    ftr.user_id, 
+                    ftr.rating, 
+                    ftr.review_text
+                FROM 
+                    fruit_tree_reviews ftr
+                WHERE
+                    ftr.user_id = ${user_id};
             `;
         } catch(e) {
             return NextResponse.json({ error: 'An error occurred when fetching fruit tree reviews.' }, { status: 500 });
