@@ -22,14 +22,14 @@ export default function RootLayout({
     <AuthContext>
       <html lang="en">
         <body className={inter.className}>
-        <ToastContainer
-                position="top-right"
-                autoClose={5000}
-                hideProgressBar={true}
-                closeOnClick
-                draggable
-                pauseOnHover
-            />
+          <ToastContainer
+            position="top-right"
+            autoClose={5000}
+            hideProgressBar={true}
+            closeOnClick
+            draggable
+            pauseOnHover
+          />
           <NavBar />
           {children}
         </body>

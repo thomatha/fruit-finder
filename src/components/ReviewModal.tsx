@@ -4,7 +4,7 @@ import UserBadge from "@/components/UserBadge";
 import { useSession } from "next-auth/react";
 import { toast } from 'react-toastify';
 
-function Modal({ treeId }) {
+function Modal({ treeId, treeDesc }) {
     const { data } = useSession();
 
     function handleClose() {
@@ -56,7 +56,7 @@ function Modal({ treeId }) {
             <div className="modal-box">
                 <h3 className="font-bold text-lg">Leave a Review!</h3>
                 <UserBadge />
-                <p id="treeModal"></p>
+                <p id="treeModal">{treeDesc}</p>
                 <p className="py-4">Press ESC key or click the button below to close</p>
                 <form method="dialog" onSubmit={handleSubmit} id="reviewForm">
                     <input type="hidden" id="treeId" name="treeId" value="" />

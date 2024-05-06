@@ -35,10 +35,6 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
     const data = await request.json();
-    console.log("tree: " + data.treeId);
-    console.log("userId: " + data.userId);
-    console.log("rating: " + data.rating);
-    console.log("text: " + data.text);
     if (!data || !data.treeId || !data.userId || !data.rating || !data.text) {
         return NextResponse.json({ error: 'The request body is missing at least one of the required attributes' }, { status: 400 });
     }

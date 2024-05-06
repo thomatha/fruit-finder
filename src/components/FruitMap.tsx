@@ -48,8 +48,6 @@ export default function FruitMap({ token }) {
   };
 
   function reviewModal() {
-    let treeDesc = selectedFruit ? selectedFruit.name : '';
-    document.getElementById("treeModal").innerHTML = treeDesc;
     (document.getElementById('review_modal') as HTMLDialogElement).showModal();
   };
 
@@ -158,8 +156,8 @@ export default function FruitMap({ token }) {
                 <div>
                   <div>Review list here..?</div>
                   <div>
-                    <Modal treeId={selectedLocation}/>
-                    <button className="btn" data-treemodal={selectedFruit ? selectedFruit.description : ''} onClick={() => reviewModal()}>Write a Review</button></div>
+                    <Modal treeId={selectedLocation} treeDesc = {selectedFruit ? selectedFruit.name : ''}/>
+                    <button className="btn" onClick={() => reviewModal()}>Write a Review</button></div>
                 </div>
             }
           </div>
