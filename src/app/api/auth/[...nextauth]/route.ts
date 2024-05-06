@@ -9,6 +9,21 @@ const handler = NextAuth({
       issuer: process.env.AUTH0_ISSUER,
     }),
   ],
+  callbacks: {
+    async jwt({ token, user}) {
+      // Persist the OAuth access_token and or the user id to the token right after signin
+      if (user) {
+        token.id = user.id
+      }
+      return token
+    }
+    ,
+    async session({ session, token}) {
+      // Send properties to the client, like an access_token and user id from a provider.
+      session.user.id = token.id
+      return session
+    }
+  }
 });
 
 export { handler as GET, handler as POST };
