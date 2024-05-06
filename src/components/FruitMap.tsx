@@ -10,9 +10,11 @@ import useSpecificFruit from "@/hooks/useSpecificFruit";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { FruitLocation } from "@/types";
 import fruitIcon from "@/utils/fruitIcon";
+
 import SlidingPanel from "react-sliding-side-panel";
 import Image from "next/image";
 import AddModal from "./AddModal";
+import Modal from "../components/ReviewModal";
 
 export default function FruitMap({ token }) {
   const mapRef = useRef<MapRef>();
@@ -24,6 +26,7 @@ export default function FruitMap({ token }) {
   const [selectedFruit, setSelectedFruit] = useSpecificFruit();
   const [openPanel, setOpenPanel] = useState(false);
   const [panelSection, setPanelSection] = useState(0);
+  const [selectedLocation, setSelectedLocation] = useState(0);
 
   if (state.loading) {
     // TODO show spinner or loading indicator
@@ -46,7 +49,12 @@ export default function FruitMap({ token }) {
 
   const panelLoad = async (id: number) => {
     setSelectedFruit(id);
+    setSelectedLocation(id);
     setOpenPanel(true);
+  };
+
+  function reviewModal() {
+    (document.getElementById('review_modal') as HTMLDialogElement).showModal();
   };
 
   return (
@@ -83,7 +91,7 @@ export default function FruitMap({ token }) {
                 color="white"
               />
               <Marker
-                key={fruitLocation.id}
+                key={fruitLocation.id} //TODO: this is causing a lot of Warning: Each child in a list should have a unique "key" prop. errors in the log
                 latitude={fruitLocation.latitude}
                 longitude={fruitLocation.longitude}
                 offset={[0, -20]}
@@ -190,9 +198,12 @@ export default function FruitMap({ token }) {
                 <p>{selectedFruit ? selectedFruit.description : ""}</p>
               </div>
             ) : (
-              <div>
-                <div>Review list here..?</div>
-              </div>
+                <div>
+                  <div>Review list here..?</div>
+                  <div>
+                    <Modal treeId={selectedLocation} treeDesc = {selectedFruit ? selectedFruit.name : ''}/>
+                    <button className="btn" onClick={() => reviewModal()}>Write a Review</button></div>
+                </div>
             )}
           </div>
           <button
