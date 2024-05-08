@@ -16,7 +16,7 @@ function useSpecificFruit(): SpecificFruit {
         `/api/fruit_locations?id=${id}`
       );
       const data = await response.json();
-
+      console.log(data);
       // Re-map api data to FruitLocationDetail object
       const fruitData = data.map((item: any) => {
         const fruitLocationDetail: FruitLocationDetail = {
