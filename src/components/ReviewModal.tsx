@@ -4,7 +4,7 @@ import UserBadge from "@/components/UserBadge";
 import { useSession } from "next-auth/react";
 import { toast } from 'react-toastify';
 
-function Modal({ treeId, treeDesc }) {
+function Modal({ treeId, treeDesc, onReviewSubmit }) {
     const { data } = useSession();
 
     function handleClose() {
@@ -37,6 +37,7 @@ function Modal({ treeId, treeDesc }) {
                     toast.error('The was an error submitting your review.');
                 }
                 else {
+                    onReviewSubmit();
                     toast.success('Your review has been submitted!');
                 }
             }
@@ -49,7 +50,7 @@ function Modal({ treeId, treeDesc }) {
         (document.getElementById("reviewForm") as HTMLFormElement).reset();
     }
 
-    const [selectedRating, setSelectedRating] = useState('3');
+    const [selectedRating, setSelectedRating] = useState('5');
 
     return (
         <dialog id="review_modal" className="modal modal-bottom sm:modal-middle">
