@@ -110,3 +110,40 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'An error occurred when creating fruit tree review.' }, { status: 500 });
     }  
 }
+export async function PATCH(request: Request) {
+    const data = await request.json();
+    if (!data || !data.reviewId || !data.rating || !data.text) {
+        return NextResponse.json({ error: 'The request body is missing at least one of the required attributes' }, { status: 400 });
+    }
+
+    try {
+        await sql`
+                UPDATE Fruit_Tree_Reviews
+                SET rating = ${data.rating},
+                review_text = ${data.text}
+                WHERE id =  ${data.reviewId};
+            `;
+        return NextResponse.json({}, { status: 201 });
+
+    } catch (e) {
+        return NextResponse.json({ error: 'An error occurred when deleting a fruit tree review.' }, { status: 500 });
+    }  
+}
+
+export async function DELETE(request: Request) {
+    const data = await request.json();
+    if (!data || !data.reviewId) {
+        return NextResponse.json({ error: 'The request body is missing a required attribute' }, { status: 400 });
+    }
+
+    try {
+        await sql`
+                DELETE FROM Fruit_Tree_Reviews
+                WHERE id =  ${data.reviewId};
+            `;
+        return NextResponse.json({}, { status: 201 });
+
+    } catch (e) {
+        return NextResponse.json({ error: 'An error occurred when deleting a fruit tree review.' }, { status: 500 });
+    }  
+}
