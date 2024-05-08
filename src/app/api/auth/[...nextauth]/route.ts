@@ -1,5 +1,6 @@
 import NextAuth from "next-auth";
 import Auth0Provider from "next-auth/providers/auth0";
+import { sql } from '@vercel/postgres';
 
 const handler = NextAuth({
   providers: [
@@ -10,7 +11,7 @@ const handler = NextAuth({
     }),
   ],
   callbacks: {
-    async jwt({ token, user}) {
+    async jwt({ token, user }) {
       // Persist the OAuth access_token and or the user id to the token right after signin
       if (user) {
         token.id = user.id
@@ -18,10 +19,23 @@ const handler = NextAuth({
       return token
     }
     ,
-    async session({ session, token}) {
+    async session({ session, token }) {
       // Send properties to the client, like an access_token and user id from a provider.
-      session.user.id = token.id
-      return session
+      session.user.id = token.id;
+      let image = session.user.image ? session.user.image : null;
+      try {
+        const date = new Date();
+        await sql`
+            INSERT INTO Users (id, name, email, image, created) 
+            VALUES (${session.user.id}, ${session.user.name}, ${session.user.email}, ${image}, ${date.toJSON()}) 
+            ON CONFLICT (id) 
+            DO UPDATE 
+            SET name = ${session.user.name}, email = ${session.user.email}, image = ${image};
+            `;
+      } catch (e) {
+        console.error(e);
+      }
+      return session;
     }
   }
 });

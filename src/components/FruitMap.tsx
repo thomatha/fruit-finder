@@ -7,8 +7,10 @@ import Map, { Marker, type MapRef } from "react-map-gl";
 import { PlusCircleIcon } from "@heroicons/react/16/solid";
 import useNearbyFruits from "@/hooks/useNearbyFruits";
 import useSpecificFruit from "@/hooks/useSpecificFruit";
+import useLocationReviews from "@/hooks/useLocationReviews";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { FruitLocation } from "@/types";
+import { FruitLocationReview } from "@/types";
 import fruitIcon from "@/utils/fruitIcon";
 
 import SlidingPanel from "react-sliding-side-panel";
@@ -24,9 +26,11 @@ export default function FruitMap({ token }) {
   const [fruits, setBounds] = useNearbyFruits();
   const [isStreet, setIsStreet] = useState(true);
   const [selectedFruit, setSelectedFruit] = useSpecificFruit();
+  const [selectedReviews, avgRating, reviewCount, setSelectedReviews] = useLocationReviews();
   const [openPanel, setOpenPanel] = useState(false);
   const [panelSection, setPanelSection] = useState(0);
   const [selectedLocation, setSelectedLocation] = useState(0);
+  const [forceRefresh, setForceRefresh] = useState(false);
 
   if (state.loading) {
     // TODO show spinner or loading indicator
@@ -49,12 +53,20 @@ export default function FruitMap({ token }) {
 
   const panelLoad = async (id: number) => {
     setSelectedFruit(id);
+    setSelectedReviews(id, forceRefresh);
     setSelectedLocation(id);
     setOpenPanel(true);
   };
 
   function reviewModal() {
     (document.getElementById('review_modal') as HTMLDialogElement).showModal();
+  };
+
+  const refreshReviewData = () => {
+    setForceRefresh(!forceRefresh);
+    setTimeout(() => {
+      setSelectedReviews(selectedLocation, forceRefresh);
+    }, 0);
   };
 
   return (
@@ -169,10 +181,6 @@ export default function FruitMap({ token }) {
               </span>
             </div>
             {/*Reviews average, placeholder until fleshing out that system more*/}
-            <div>
-              <span>★★★★</span>
-              <span>☆</span>
-            </div>
           </div>
           <div className="grid grid-cols-2 px-4">
             <div>
@@ -199,10 +207,60 @@ export default function FruitMap({ token }) {
               </div>
             ) : (
                 <div>
-                  <div>Review list here..?</div>
-                  <div>
-                    <Modal treeId={selectedLocation} treeDesc = {selectedFruit ? selectedFruit.name : ''}/>
-                    <button className="btn" onClick={() => reviewModal()}>Write a Review</button></div>
+                  <div className="flex stats shadow mt-2 mb-4 justify-center">
+                    <div className="stat">
+                      <div className="stat-figure text-primary">
+                        <div className="rating rating-md rating-half">
+                          <input type="radio" name="rating-10" className="rating-hidden" />
+                          <input type="radio" name="rating-10" className="mask mask-star-2 mask-half-1" checked={avgRating == 0.5} readOnly />
+                          <input type="radio" name="rating-10" className="mask mask-star-2 mask-half-2" checked={avgRating == 1.0} readOnly />
+                          <input type="radio" name="rating-10" className="mask mask-star-2 mask-half-1" checked={avgRating == 1.5} readOnly />
+                          <input type="radio" name="rating-10" className="mask mask-star-2 mask-half-2" checked={avgRating == 2.0} readOnly />
+                          <input type="radio" name="rating-10" className="mask mask-star-2 mask-half-1" checked={avgRating == 2.5} readOnly />
+                          <input type="radio" name="rating-10" className="mask mask-star-2 mask-half-2" checked={avgRating == 3.0} readOnly />
+                          <input type="radio" name="rating-10" className="mask mask-star-2 mask-half-1" checked={avgRating == 3.5} readOnly />
+                          <input type="radio" name="rating-10" className="mask mask-star-2 mask-half-2" checked={avgRating == 4.0} readOnly />
+                          <input type="radio" name="rating-10" className="mask mask-star-2 mask-half-1" checked={avgRating == 4.5} readOnly />
+                          <input type="radio" name="rating-10" className="mask mask-star-2 mask-half-2" checked={avgRating == 5.0} readOnly />
+                        </div>
+                      </div>   
+                      <div className="stat-value">{avgRating}</div>
+                      <div className="stat-desc">{reviewCount} reviews</div>
+                    </div>
+                  </div>
+                  <div className="flex justify-center">
+                    <Modal treeId={selectedLocation} treeDesc={selectedFruit ? selectedFruit.name : ''} onReviewSubmit={refreshReviewData} />
+                    <button className="btn btn-outline" onClick={() => reviewModal()}>Write a Review</button>
+                  </div>
+                  <div id="reviewList">
+                    {selectedReviews.map((locationReview: FruitLocationReview) => (
+                      <>
+                        <div className="card bg-base-100 shadow-xl my-2">
+                          <div className="card-body px-2">
+                            <div className="p-3">
+                              <img
+                                src={locationReview.user_img}
+                                alt={locationReview.user_name}
+                                width={32}
+                                height={32}
+                                className="rounded-full border-solid border-current border inline-block mr-1"
+                              />
+                              {locationReview.user_name}
+                            </div>
+                            <div id="reviewRating" className="rating">
+                              <input type="radio" id="rating-1" className="mask mask-star" checked={locationReview.rating == 1} readOnly />
+                              <input type="radio" id="rating-2" className="mask mask-star" checked={locationReview.rating == 2} readOnly />
+                              <input type="radio" id="rating-3" className="mask mask-star" checked={locationReview.rating == 3} readOnly />
+                              <input type="radio" id="rating-4" className="mask mask-star" checked={locationReview.rating == 4} readOnly />
+                              <input type="radio" id="rating-5" className="mask mask-star" checked={locationReview.rating == 5} readOnly />
+                            </div>
+                            <p>{locationReview.created}</p>
+                            <p>{locationReview.review_text}</p>
+                          </div>
+                        </div>
+                      </>
+                    ))}
+                  </div>
                 </div>
             )}
           </div>
