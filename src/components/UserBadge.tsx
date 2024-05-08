@@ -4,7 +4,11 @@
 import { useSession } from "next-auth/react";
 
 export default function UserBadge() {
-  const { data } = useSession();
+  const { data, status } = useSession();
+
+  if (status !== "authenticated") {
+    return <></>;
+  }
 
   return (
     <div className="p-3">
