@@ -1,20 +1,25 @@
-"use client";
-import { useSession } from 'next-auth/react';
+"useClient"
+import { useSession } from 'next-auth/react'
+import { useState, useEffect } from 'react'
 import React from 'react'
-import { sql } from '@vercel/postgres';
+import {useUserReviews} from '@/hooks/useUserReviews';
 
-const UserReviews = ({reviews}) => {
-    const {data} = useSession();
-    console.log(data)
-    let rev = reviews
+function UserReviews() {
+
+  const {data} = useSession();
+  const id = data?.user?.id;
+
+  const {user, isLoading, isError} = useUserReviews(id);
+
+  if(isError) console.log(isError);
 
   return (
     <div>
-      <p></p>
+      <ul>
+        <p></p>
+      </ul>
     </div>
   )
 }
 
 export default UserReviews
-
-
