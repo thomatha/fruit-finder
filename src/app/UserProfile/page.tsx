@@ -2,11 +2,12 @@
 
 import Biography from '@/components/Biography';
 import UserReviews from '@/components/UserReviews';
-import { error } from 'console';
 import { useSession } from 'next-auth/react'
 import React, { useEffect, useState } from 'react'
 
 const Profile = () => {
+
+  
   const [bio, setBio] = useState("This is your bio! Make it yours...");
   const handleSaveBio = (newBio) => {
     setBio(newBio);
@@ -25,7 +26,7 @@ const Profile = () => {
     </div>
     <div>
       <h1 className="text-5xl font-bold">Hello, {data?.user.name}</h1>
-      <Biography bio={bio} onSaveBio={handleSaveBio} /> <br />
+      <Biography bio={bio} onSaveBio={handleSaveBio} /> <br /> <br/>
       <UserReviews />
     </div>
   </div>

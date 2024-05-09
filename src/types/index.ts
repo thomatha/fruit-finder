@@ -31,3 +31,10 @@ export type FruitLocationReview = {
   user_name: string;
 };
 
+export type UserReview = {
+    id: number;
+    tree_id: number;
+    user_id: string;
+    rating: number;
+    review_text: string;
+}

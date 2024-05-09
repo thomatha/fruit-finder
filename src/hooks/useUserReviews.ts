@@ -1,14 +1,15 @@
-import { isErrored } from "stream";
-import useSWR, {Fetcher} from "swr";
+import useSWR from "swr";
 
 export function useUserReviews (id: string) {
-    const {data, error, isLoading} = useSWR(`/api/reviews?user_id=${id}`, fetch)
+
+    const fetcher = url => fetch(url).then(r => r.json())
+
+    const {data, error} = useSWR(`/api/reviews?user_id=${id}`, fetcher)
 
     console.log("From userReview: ", data);
 
     return {
         user: data,
-        isLoading,
         isError: error
     }
 }

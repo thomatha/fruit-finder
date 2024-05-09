@@ -17,6 +17,8 @@ function Modal({ treeId, treeDesc, onReviewSubmit }) {
         let formElements = event.currentTarget.elements;
         let rating = selectedRating;
         let userId = data?.user?.id;
+        console.log(data);
+        console.log(userId);
         let reviewData = JSON.stringify({
             treeId: treeId,
             userId: userId,
