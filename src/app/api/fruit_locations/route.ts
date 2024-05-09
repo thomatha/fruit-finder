@@ -252,8 +252,29 @@ export async function POST(request: Request) {
         } catch(e) {
             return NextResponse.json({ error: 'An error occurred when creating fruit tree location' }, { status: 500 });
         }
+    } else if (data.s3_img_link && !data.description) {
+        try {
+            await sql`
+                INSERT INTO fruit_tree_locations 
+                    (name, latitude, longitude, s3_img_link, fruit_id)
+                VALUES 
+                    (${data.name}, ${data.latitude}, ${data.longitude}, ${data.s3_img_link}, ${data.fruit_id});
+            `;
+        } catch(e) {
+            return NextResponse.json({ error: 'An error occurred when creating fruit tree location' }, { status: 500 });
+        }
+    } else if (!data.s3_img_link && data.description) {
+        try {
+            await sql`
+                INSERT INTO fruit_tree_locations 
+                    (name, description, latitude, longitude, fruit_id)
+                VALUES 
+                    (${data.name}, ${data.description}, ${data.latitude}, ${data.longitude}, ${data.fruit_id});
+            `;
+        } catch(e) {
+            return NextResponse.json({ error: 'An error occurred when creating fruit tree location' }, { status: 500 });
+        }
     } else {
-        // For now, for simplicity's sake, we assume that if one optional field is present, all are
         try {
             await sql`
                 INSERT INTO fruit_tree_locations 
