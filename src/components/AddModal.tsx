@@ -69,8 +69,9 @@ export default function AddModal({ token, lat, lng, onClose, onAdd }) {
             </option>
           ))}
         </select>
-        <div className="modal-action">
+        <div>
           <input
+            className="mt-3"
             id="file"
             type="file"
             onChange={(e) => {
@@ -81,6 +82,8 @@ export default function AddModal({ token, lat, lng, onClose, onAdd }) {
             }}
             accept="image/png, image/jpeg"
           />
+        </div>
+        <div className="modal-action">
           <button
             className="btn btn-primary"
             disabled={!fruitType || saving}
