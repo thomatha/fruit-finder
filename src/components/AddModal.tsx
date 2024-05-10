@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ExclamationCircleIcon } from "@heroicons/react/16/solid";
+import { ExclamationCircleIcon, CameraIcon } from "@heroicons/react/16/solid";
 import fruitIcon from "@/utils/fruitIcon";
 import AddMap from "./AddMap";
 import useFruits from "@/hooks/useFruits";
@@ -69,19 +69,29 @@ export default function AddModal({ token, lat, lng, onClose, onAdd }) {
             </option>
           ))}
         </select>
-        <div>
+        <div className="mt-3 flex justify-center">
           <input
-            className="mt-3"
+            className="hidden"
             id="file"
             type="file"
+            capture="environment"
             onChange={(e) => {
               const files = e.target.files;
               if (files) {
                 setFile(files[0]);
               }
             }}
-            accept="image/png, image/jpeg"
+            accept="image/*"
           />
+          <button
+            className="btn rounded-full btn-lg btn-primary px-4"
+            onClick={() => {
+              document.getElementById("file").click();
+            }}
+          >
+            <CameraIcon className="w-8 h-8" />
+            <span className="hidden md:inline">Add Photo</span>
+          </button>
         </div>
         <div className="modal-action">
           <button
