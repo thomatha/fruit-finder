@@ -12,9 +12,10 @@ export default function AddModal({ token, lat, lng, onClose, onAdd }) {
   const [longitude, setLongitude] = useState(lng);
   const [fruits, loading] = useFruits();
   const [addFruit, saving, error] = useAddFruit();
+  const [file, setFile] = useState<File | null>(null);
 
   async function saveFruit() {
-    await addFruit(fruitType, latitude, longitude);
+    await addFruit(fruitType, latitude, longitude, file);
     onAdd();
   }
 
@@ -69,6 +70,17 @@ export default function AddModal({ token, lat, lng, onClose, onAdd }) {
           ))}
         </select>
         <div className="modal-action">
+          <input
+            id="file"
+            type="file"
+            onChange={(e) => {
+              const files = e.target.files;
+              if (files) {
+                setFile(files[0]);
+              }
+            }}
+            accept="image/png, image/jpeg"
+          />
           <button
             className="btn btn-primary"
             disabled={!fruitType || saving}
