@@ -77,7 +77,7 @@ export default function AddModal({ token, lat, lng, onClose, onAdd }) {
         <textarea
           className="textarea textarea-bordered w-full mt-3"
           maxLength={1000}
-          placeholder="Notes"
+          placeholder="Notes (Optional)"
           onChange={(e) => setNotes(e.target.value)}
         ></textarea>
         <div className="mt-3 flex justify-center">
