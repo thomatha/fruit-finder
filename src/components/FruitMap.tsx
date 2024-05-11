@@ -18,6 +18,8 @@ import { FruitLocation } from "@/types";
 import fruitIcon from "@/utils/fruitIcon";
 import AddModal from "./AddModal";
 import SideBar from "./SideBar";
+import { toast } from 'react-toastify';
+import SearchBar from "./SearchBar";
 
 export default function FruitMap({ token }) {
   const mapRef = useRef<MapRef>();
@@ -68,6 +70,48 @@ export default function FruitMap({ token }) {
     setTimeout(() => {
       setSelectedReviews(selectedLocation, forceRefresh);
     }, 0);
+  };
+
+  const retrieveSearch = (e: any) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget)
+    let searchTxt = String(formData.get("searchText"));
+    if (searchTxt != '') {
+      const fetchSearch = async () => {
+        const searchResponse = await fetch(
+          `https://api.mapbox.com/search/searchbox/v1/suggest?q=${searchTxt}&types=place,country,region,city&access_token=${token}&session_token=${token}`
+        );
+        const searchData = await searchResponse.json();
+        if (!searchResponse.ok) {
+          toast.error("Error retreiving your search suggestions.");
+        }
+        else {
+          if (searchData.suggestions.length > 0) {
+            let suggestionId = searchData.suggestions[0].mapbox_id
+            const fetchSuggestion = async () => {
+              const suggestionResponse = await fetch(
+                `https://api.mapbox.com/search/searchbox/v1/retrieve/${suggestionId}?access_token=${token}&session_token=${token}`
+              );
+              const suggestionData = await suggestionResponse.json();
+              if (!suggestionResponse.ok) {
+                toast.error("Error retreiving your search location.");
+              }
+              else {
+                if (suggestionData) {
+                  let coords = suggestionData.features[0].properties.bbox;
+                  mapRef.current?.fitBounds(coords);
+                }
+              }
+            };
+            fetchSuggestion();
+          }
+          else {
+            toast.error("No locations found. Please try a new search.");
+          }
+        }
+      };
+      fetchSearch();
+    }
   };
 
   return (
@@ -153,6 +197,7 @@ export default function FruitMap({ token }) {
           )}
         </div>
         <div className="navbar-end">
+          <SearchBar onSearchSubmit={retrieveSearch} />
           <div className="join">
             <button
               className={`btn btn-sm join-item ${isStreet ? "btn-active" : ""}`}
