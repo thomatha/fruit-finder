@@ -5,6 +5,11 @@ import { useSession } from "next-auth/react";
 import { useGeolocation } from "@uidotdev/usehooks";
 import Map, { Marker, type MapRef } from "react-map-gl";
 import { PlusCircleIcon } from "@heroicons/react/16/solid";
+import {
+  GlobeEuropeAfricaIcon,
+  MapIcon,
+  MapPinIcon,
+} from "@heroicons/react/24/outline";
 import useNearbyFruits from "@/hooks/useNearbyFruits";
 import useSpecificFruit from "@/hooks/useSpecificFruit";
 import useLocationReviews from "@/hooks/useLocationReviews";
@@ -12,7 +17,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import { FruitLocation } from "@/types";
 import fruitIcon from "@/utils/fruitIcon";
 import AddModal from "./AddModal";
-import SideBar from './SideBar';
+import SideBar from "./SideBar";
 
 export default function FruitMap({ token }) {
   const mapRef = useRef<MapRef>();
@@ -22,7 +27,8 @@ export default function FruitMap({ token }) {
   const [fruits, setBounds] = useNearbyFruits();
   const [isStreet, setIsStreet] = useState(true);
   const [selectedFruit, setSelectedFruit] = useSpecificFruit();
-  const [selectedReviews, avgRating, reviewCount, setSelectedReviews] = useLocationReviews();
+  const [selectedReviews, avgRating, reviewCount, setSelectedReviews] =
+    useLocationReviews();
   const [openPanel, setOpenPanel] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(0);
   const [forceRefresh, setForceRefresh] = useState(false);
@@ -54,8 +60,8 @@ export default function FruitMap({ token }) {
   };
 
   function reviewModal() {
-    (document.getElementById('review_modal') as HTMLDialogElement).showModal();
-  };
+    (document.getElementById("review_modal") as HTMLDialogElement).showModal();
+  }
 
   const refreshReviewData = () => {
     setForceRefresh(!forceRefresh);
@@ -119,14 +125,27 @@ export default function FruitMap({ token }) {
       </div>
 
       <div className="navbar bg-white fixed bottom-0 z-10">
-        <div className="navbar-start"></div>
+        <div className="navbar-start">
+          <button
+            className="btn btn-sm"
+            onClick={() => {
+              mapRef.current?.flyTo({
+                center: [state.longitude, state.latitude],
+              });
+            }}
+          >
+            <MapPinIcon className="h-6 w-6" />
+            <span className="hidden md:inline">Reset</span>
+          </button>
+        </div>
         <div className="navbar-center">
           {status === "authenticated" ? (
             <button
               className="btn btn-primary"
               onClick={() => setModalOpen(true)}
             >
-              <PlusCircleIcon className="h-6 w-6" /> Add Fruit
+              <PlusCircleIcon className="h-6 w-6" />{" "}
+              <span className="hidden md:inline">Add Fruit</span>
             </button>
           ) : (
             // TODO show log in button if user not logged in
@@ -134,30 +153,34 @@ export default function FruitMap({ token }) {
           )}
         </div>
         <div className="navbar-end">
-          <button
-            className={`btn btn-sm mr-2 ${isStreet ? "btn-active" : ""}`}
-            onClick={() => setIsStreet(true)}
-          >
-            Street
-          </button>
-          <button
-            className={`btn btn-sm ${isStreet ? "" : "btn-active"}`}
-            onClick={() => setIsStreet(false)}
-          >
-            Satellite
-          </button>
+          <div className="join">
+            <button
+              className={`btn btn-sm join-item ${isStreet ? "btn-active" : ""}`}
+              onClick={() => setIsStreet(true)}
+            >
+              <MapIcon className="h-6 w-6" />
+              <span className="hidden md:inline">Street</span>
+            </button>
+            <button
+              className={`btn btn-sm join-item ${isStreet ? "" : "btn-active"}`}
+              onClick={() => setIsStreet(false)}
+            >
+              <GlobeEuropeAfricaIcon className="h-6 w-6" />
+              <span className="hidden md:inline">Satellite</span>
+            </button>
+          </div>
         </div>
       </div>
       <SideBar
-        openPanel = {openPanel}
-        setOpenPanel = {setOpenPanel}
-        selectedFruit = {selectedFruit}
-        selectedReviews = {selectedReviews}
-        avgRating = {avgRating}
-        reviewCount = {reviewCount}
-        refreshReviewData = {refreshReviewData}
-        reviewModal = {reviewModal}
-        selectedLocation = {selectedLocation}
+        openPanel={openPanel}
+        setOpenPanel={setOpenPanel}
+        selectedFruit={selectedFruit}
+        selectedReviews={selectedReviews}
+        avgRating={avgRating}
+        reviewCount={reviewCount}
+        refreshReviewData={refreshReviewData}
+        reviewModal={reviewModal}
+        selectedLocation={selectedLocation}
       />
       <div></div>
 
