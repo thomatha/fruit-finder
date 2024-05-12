@@ -6,8 +6,6 @@ export function useUserReviews (id: string) {
 
     const {data, error} = useSWR(`/api/reviews?user_id=${id}`, fetcher)
 
-    console.log("From userReview: ", data);
-
     return {
         user: data,
         isError: error

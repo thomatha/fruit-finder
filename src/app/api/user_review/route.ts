@@ -3,7 +3,6 @@ import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
-    console.log(searchParams);
     const user_id = searchParams.get('user_id');
 
     let fruitTreeReviews = null;

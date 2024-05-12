@@ -25,8 +25,8 @@ const Profile = () => {
     <div className="p-3">
     </div>
     <div>
-      <h1 className="text-5xl font-bold">Hello, {data?.user.name}</h1>
-      <Biography bio={bio} onSaveBio={handleSaveBio} /> <br /> <br/>
+      <h1 className="mb-4 text-2xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white">Hello, {data?.user.name}</h1>
+      {/*<Biography bio={bio} onSaveBio={handleSaveBio} /> <br /> <br/>*/}
       <UserReviews />
     </div>
   </div>
