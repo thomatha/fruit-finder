@@ -11,11 +11,12 @@ const handler = NextAuth({
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, session }) {
       // Persist the OAuth access_token and or the user id to the token right after signin
       if (user) {
         token.id = user.id
       }
+
       return token
     }
     ,
