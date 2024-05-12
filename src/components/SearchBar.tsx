@@ -1,6 +1,6 @@
 export default function SearchBar({ onSearchSubmit }) {
   return (
-    <div className="mx-2">
+    <div className="mapboxgl-ctrl m-2 w-80">
       <div>
         <form onSubmit={onSearchSubmit}>
           <label className="input input-sm input-bordered flex items-center gap-2">

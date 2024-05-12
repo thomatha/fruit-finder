@@ -20,6 +20,8 @@ import AddModal from "./AddModal";
 import SideBar from "./SideBar";
 import { toast } from 'react-toastify';
 import SearchBar from "./SearchBar";
+import FruitFilter from "./FruitFilter";
+import { Fruit } from "@/types";
 
 export default function FruitMap({ token }) {
   const mapRef = useRef<MapRef>();
@@ -34,6 +36,7 @@ export default function FruitMap({ token }) {
   const [openPanel, setOpenPanel] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(0);
   const [forceRefresh, setForceRefresh] = useState(false);
+  const [fruitFilter, setFruitFilter] = useState<Fruit>({ id: -1, name: 'Fruit Filter' });
 
   if (state.loading) {
     // TODO show spinner or loading indicator
@@ -50,7 +53,20 @@ export default function FruitMap({ token }) {
       bounds?._ne.lat,
       bounds?._ne.lng,
       bounds?._sw.lng,
-      bounds?._sw.lat
+      bounds?._sw.lat,
+      fruitFilter.id
+    );
+  };
+
+  const updateFilter = (newFruit: Fruit) => {
+    setFruitFilter(newFruit);
+    const bounds = mapRef.current?.getBounds();
+    setBounds(
+      bounds?._ne.lat,
+      bounds?._ne.lng,
+      bounds?._sw.lng,
+      bounds?._sw.lat,
+      newFruit.id
     );
   };
 
@@ -139,6 +155,8 @@ export default function FruitMap({ token }) {
             setOpenPanel(false);
           }}
         >
+          <SearchBar onSearchSubmit={retrieveSearch} />
+          <FruitFilter handleFilter={updateFilter}/>
           {fruits.map((fruitLocation: FruitLocation) => (
             <>
               <Marker
@@ -197,7 +215,6 @@ export default function FruitMap({ token }) {
           )}
         </div>
         <div className="navbar-end">
-          <SearchBar onSearchSubmit={retrieveSearch} />
           <div className="join">
             <button
               className={`btn btn-sm join-item ${isStreet ? "btn-active" : ""}`}

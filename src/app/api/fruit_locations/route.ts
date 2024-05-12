@@ -140,7 +140,7 @@ export async function GET(request: Request) {
         }
     } else if(east && west && north && south) {
         // Fetch all fruit tree locations within a specified bounding box
-        if(fruitId) {
+        if(fruitId != "-1") {
             try {
                 fruitTreeLocations = await sql`
                     SELECT 
