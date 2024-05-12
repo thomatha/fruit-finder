@@ -1,34 +1,37 @@
 "use client";
 
-import UserProfile from '@/components/Profile'
-import UserBadge from '@/components/UserBadge'
+import Biography from '@/components/Biography';
+import UserReviews from '@/components/UserReviews';
 import { useSession } from 'next-auth/react'
 import React, { useEffect, useState } from 'react'
 
 const Profile = () => {
 
-  const {data } = useSession();
+  
+  const [bio, setBio] = useState("This is your bio! Make it yours...");
+  const handleSaveBio = (newBio) => {
+    setBio(newBio);
+
+    // need to add code to save in the DB here
+
+  };
+
+  const { data } = useSession();
+  let id = data?.user?.id;
 
   return (
   <div className="hero min-h-screen bg-base-200">
     <div className="hero-content flex-col lg:flex-row">
     <div className="p-3">
-      <img
-        src={data?.user?.image || ""}
-        alt={data?.user?.name || ""}
-        width={150}
-        height={150}
-        className="rounded-full border-solid border-current border inline-block mr-1"
-      />
     </div>
     <div>
-      <h1 className="text-5xl font-bold">Hello, {data?.user.name}</h1>
-      <p className="py-6">This is where your bio will go!</p>
-      <button className="btn btn-primary float-left mr-auto">View My Reviews</button>
+      <h1 className="mb-4 text-2xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white">Hello, {data?.user.name}</h1>
+      {/*<Biography bio={bio} onSaveBio={handleSaveBio} /> <br /> <br/>*/}
+      <UserReviews />
     </div>
   </div>
 </div>
-  )
-}
+  );
+};
 
 export default Profile
