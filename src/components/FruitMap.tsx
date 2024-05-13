@@ -14,7 +14,7 @@ import useNearbyFruits from "@/hooks/useNearbyFruits";
 import useSpecificFruit from "@/hooks/useSpecificFruit";
 import useLocationReviews from "@/hooks/useLocationReviews";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { FruitLocation } from "@/types";
+import { Fruit, FruitLocation } from "@/types";
 import fruitIcon from "@/utils/fruitIcon";
 import AddModal from "./AddModal";
 import SideBar from "./SideBar";
@@ -138,7 +138,11 @@ export default function FruitMap({ token }) {
           }}
         >
           <SearchBar onSearchSubmit={retrieveSearch} />
-          <FruitFilter handleFilter={(fruit) => setFruitFilter(fruit)} />
+          <FruitFilter
+            handleFilter={(fruit: Fruit) => {
+              setFruitFilter(fruit.id === -1 ? undefined : fruit);
+            }}
+          />
           {fruits.map((fruitLocation: FruitLocation) => (
             <>
               <Marker
