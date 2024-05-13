@@ -8,24 +8,15 @@ import Link from "next/link";
 
 const NavBar = () => {
 
-  const [user, setUser] = useState(null);
+  const {data: session, status} = useSession();
+  
+  
+  if (status === "authenticated") { 
 
-  useEffect(() => {
-    const fetchSession = async () => {
-      const session = await getSession();
-      if (session) {
-        setUser(session.user);
-      } else {
-        // need to add error handling here for if user isn't signed in
+    const user = session.user;
 
-      }
-    };
-
-    fetchSession();
-  }, [])
-
-  return (
-    <div className="navbar bg-base-100">
+    return (
+      <div className="navbar bg-base-100">
       <div className="flex-1">
         <a href="/" className="btn btn-ghost text-xl">
           Fruit Finder
@@ -40,7 +31,6 @@ const NavBar = () => {
               <ul className="p-2 bg-base-100 rounded-t-none">
                 <li>
                 {user ? (
-                  // UPDATE THESE WHEN YOU HAVE SIGN IN/OUT FUNCTIONALITY
                     <Link href="/">Sign Out</Link>
                   ) : (
                     <Link href="/">Sign In</Link>
@@ -62,7 +52,21 @@ const NavBar = () => {
         </ul>
       </div>
     </div>
-  );
+    )
+  } else {
+    return (
+      <div className="navbar bg-base-100">
+      <div className="flex-1">
+        <a href="/" className="btn btn-ghost text-xl">
+          Fruit Finder
+        </a>
+      </div>
+      <div className="flex-none">
+        <span className="loading loading-spinner loading-xs"></span>  
+      </div>
+    </div>
+    )
+  }
 };
 
 export default NavBar;

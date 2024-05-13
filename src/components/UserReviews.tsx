@@ -9,7 +9,7 @@ function UserReviews() {
   const {data} = useSession();
   const userID = data?.user?.id;
 
-  const res = useUserReviews(userID);
+  const res = useUserReviews(userID); 
 
   return (
     <div>
@@ -18,22 +18,28 @@ function UserReviews() {
       {res.user ? (
         res.user.map(review => (
           <>
-          <div className='card w-96 bg-base-100 shadow-xl' key={review.id}>
+          <div className='card-bordered w-96 bg-base-100 shadow-xl' key={review.id}>
             <UserBadge />
             <div id="reviewRating" className="rating">
-                                <input type="radio" id="rating-1" className="mask mask-star" checked={review.rating == 1} readOnly />
-                                <input type="radio" id="rating-2" className="mask mask-star" checked={review.rating == 2} readOnly />
-                                <input type="radio" id="rating-3" className="mask mask-star" checked={review.rating == 3} readOnly />
-                                <input type="radio" id="rating-4" className="mask mask-star" checked={review.rating == 4} readOnly />
-                                <input type="radio" id="rating-5" className="mask mask-star" checked={review.rating == 5} readOnly />
-                                </div>
-            <p className='card-body'>{review.review_text}</p>
+              <input type="radio" id="rating-1" className="mask mask-star" checked={review.rating == 1} readOnly />
+              <input type="radio" id="rating-2" className="mask mask-star" checked={review.rating == 2} readOnly />
+              <input type="radio" id="rating-3" className="mask mask-star" checked={review.rating == 3} readOnly />
+              <input type="radio" id="rating-4" className="mask mask-star" checked={review.rating == 4} readOnly />
+              <input type="radio" id="rating-5" className="mask mask-star" checked={review.rating == 5} readOnly />
+            </div>
+            <br/>
+            <div>
+              <p className='card-body'>{review.created}<br/>{review.review_text}</p>
+            </div>
           </div>
           <br/>
           </>
         ))
       ) : (
+        <>
         <div>Reviews Loading...</div>
+        <span className="loading loading-spinner loading-xs"></span>
+        </>
       )}
     </div>
   )
