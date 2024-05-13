@@ -1,5 +1,9 @@
 import { useState } from "react";
-import { ExclamationCircleIcon } from "@heroicons/react/16/solid";
+import {
+  ExclamationCircleIcon,
+  CameraIcon,
+  CheckIcon,
+} from "@heroicons/react/16/solid";
 import fruitIcon from "@/utils/fruitIcon";
 import AddMap from "./AddMap";
 import useFruits from "@/hooks/useFruits";
@@ -12,9 +16,11 @@ export default function AddModal({ token, lat, lng, onClose, onAdd }) {
   const [longitude, setLongitude] = useState(lng);
   const [fruits, loading] = useFruits();
   const [addFruit, saving, error] = useAddFruit();
+  const [file, setFile] = useState<File | null>(null);
+  const [notes, setNotes] = useState<string | null>();
 
   async function saveFruit() {
-    await addFruit(fruitType, latitude, longitude);
+    await addFruit(fruitType, latitude, longitude, notes, file);
     onAdd();
   }
 
@@ -68,6 +74,42 @@ export default function AddModal({ token, lat, lng, onClose, onAdd }) {
             </option>
           ))}
         </select>
+        <textarea
+          className="textarea textarea-bordered w-full mt-3"
+          maxLength={1000}
+          placeholder="Notes (Optional)"
+          onChange={(e) => setNotes(e.target.value)}
+        ></textarea>
+        <div className="mt-3 flex justify-center">
+          <input
+            className="hidden"
+            id="file"
+            type="file"
+            capture="environment"
+            onChange={(e) => {
+              const files = e.target.files;
+              if (files) {
+                setFile(files[0]);
+              }
+            }}
+            accept="image/*"
+          />
+          <button
+            className={`btn rounded-full btn-lg ${
+              file ? "btn-success" : "btn-primary"
+            } px-4`}
+            onClick={() => {
+              document.getElementById("file").click();
+            }}
+          >
+            {file ? (
+              <CheckIcon className="w-8 h-8" />
+            ) : (
+              <CameraIcon className="w-8 h-8" />
+            )}
+            {file ? "Change Photo" : "Add Photo"}
+          </button>
+        </div>
         <div className="modal-action">
           <button
             className="btn btn-primary"

@@ -1,28 +1,37 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { Fragment, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useGeolocation } from "@uidotdev/usehooks";
 import Map, { Marker, type MapRef } from "react-map-gl";
 import { PlusCircleIcon } from "@heroicons/react/16/solid";
+import {
+  GlobeEuropeAfricaIcon,
+  MapIcon,
+  MapPinIcon,
+} from "@heroicons/react/24/outline";
 import useNearbyFruits from "@/hooks/useNearbyFruits";
 import useSpecificFruit from "@/hooks/useSpecificFruit";
 import useLocationReviews from "@/hooks/useLocationReviews";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { FruitLocation } from "@/types";
+import { Fruit, FruitLocation } from "@/types";
 import fruitIcon from "@/utils/fruitIcon";
 import AddModal from "./AddModal";
-import SideBar from './SideBar';
+import SideBar from "./SideBar";
+import { toast } from "react-toastify";
+import SearchBar from "./SearchBar";
+import FruitFilter from "./FruitFilter";
 
 export default function FruitMap({ token }) {
   const mapRef = useRef<MapRef>();
   const state = useGeolocation();
   const [modalOpen, setModalOpen] = useState(false);
   const { status } = useSession();
-  const [fruits, setBounds] = useNearbyFruits();
+  const [fruits, setBounds, setFruitFilter] = useNearbyFruits();
   const [isStreet, setIsStreet] = useState(true);
   const [selectedFruit, setSelectedFruit] = useSpecificFruit();
-  const [selectedReviews, avgRating, reviewCount, setSelectedReviews] = useLocationReviews();
+  const [selectedReviews, avgRating, reviewCount, setSelectedReviews] =
+    useLocationReviews();
   const [openPanel, setOpenPanel] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(0);
   const [forceRefresh, setForceRefresh] = useState(false);
@@ -54,14 +63,53 @@ export default function FruitMap({ token }) {
   };
 
   function reviewModal() {
-    (document.getElementById('review_modal') as HTMLDialogElement).showModal();
-  };
+    (document.getElementById("review_modal") as HTMLDialogElement).showModal();
+  }
 
   const refreshReviewData = () => {
     setForceRefresh(!forceRefresh);
     setTimeout(() => {
       setSelectedReviews(selectedLocation, forceRefresh);
     }, 0);
+  };
+
+  const retrieveSearch = (e: any) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    let searchTxt = String(formData.get("searchText"));
+    if (searchTxt != "") {
+      const fetchSearch = async () => {
+        const searchResponse = await fetch(
+          `https://api.mapbox.com/search/searchbox/v1/suggest?q=${searchTxt}&types=place,country,region,city&access_token=${token}&session_token=${token}`
+        );
+        const searchData = await searchResponse.json();
+        if (!searchResponse.ok) {
+          toast.error("Error retreiving your search suggestions.");
+        } else {
+          if (searchData.suggestions.length > 0) {
+            let suggestionId = searchData.suggestions[0].mapbox_id;
+            const fetchSuggestion = async () => {
+              const suggestionResponse = await fetch(
+                `https://api.mapbox.com/search/searchbox/v1/retrieve/${suggestionId}?access_token=${token}&session_token=${token}`
+              );
+              const suggestionData = await suggestionResponse.json();
+              if (!suggestionResponse.ok) {
+                toast.error("Error retreiving your search location.");
+              } else {
+                if (suggestionData) {
+                  let coords = suggestionData.features[0].properties.bbox;
+                  mapRef.current?.fitBounds(coords);
+                }
+              }
+            };
+            fetchSuggestion();
+          } else {
+            toast.error("No locations found. Please try a new search.");
+          }
+        }
+      };
+      fetchSearch();
+    }
   };
 
   return (
@@ -89,16 +137,20 @@ export default function FruitMap({ token }) {
             setOpenPanel(false);
           }}
         >
+          <SearchBar onSearchSubmit={retrieveSearch} />
+          <FruitFilter
+            handleFilter={(fruit: Fruit) => {
+              setFruitFilter(fruit.id === -1 ? undefined : fruit);
+            }}
+          />
           {fruits.map((fruitLocation: FruitLocation) => (
-            <>
+            <Fragment key={fruitLocation.id}>
               <Marker
-                key={`${fruitLocation.id}-bg`}
                 latitude={fruitLocation.latitude}
                 longitude={fruitLocation.longitude}
                 color="white"
               />
               <Marker
-                key={fruitLocation.id} //TODO: this is causing a lot of Warning: Each child in a list should have a unique "key" prop. errors in the log
                 latitude={fruitLocation.latitude}
                 longitude={fruitLocation.longitude}
                 offset={[0, -20]}
@@ -112,21 +164,34 @@ export default function FruitMap({ token }) {
                   {fruitIcon(fruitLocation.fruit)}
                 </span>
               </Marker>
-            </>
+            </Fragment>
           ))}
           <Marker longitude={state.longitude} latitude={state.latitude} />
         </Map>
       </div>
 
       <div className="navbar bg-white fixed bottom-0 z-10">
-        <div className="navbar-start"></div>
+        <div className="navbar-start">
+          <button
+            className="btn btn-sm"
+            onClick={() => {
+              mapRef.current?.flyTo({
+                center: [state.longitude, state.latitude],
+              });
+            }}
+          >
+            <MapPinIcon className="h-6 w-6" />
+            <span className="hidden md:inline">Reset</span>
+          </button>
+        </div>
         <div className="navbar-center">
           {status === "authenticated" ? (
             <button
               className="btn btn-primary"
               onClick={() => setModalOpen(true)}
             >
-              <PlusCircleIcon className="h-6 w-6" /> Add Fruit
+              <PlusCircleIcon className="h-6 w-6" />{" "}
+              <span className="hidden md:inline">Add Fruit</span>
             </button>
           ) : (
             // TODO show log in button if user not logged in
@@ -134,30 +199,34 @@ export default function FruitMap({ token }) {
           )}
         </div>
         <div className="navbar-end">
-          <button
-            className={`btn btn-sm mr-2 ${isStreet ? "btn-active" : ""}`}
-            onClick={() => setIsStreet(true)}
-          >
-            Street
-          </button>
-          <button
-            className={`btn btn-sm ${isStreet ? "" : "btn-active"}`}
-            onClick={() => setIsStreet(false)}
-          >
-            Satellite
-          </button>
+          <div className="join">
+            <button
+              className={`btn btn-sm join-item ${isStreet ? "btn-active" : ""}`}
+              onClick={() => setIsStreet(true)}
+            >
+              <MapIcon className="h-6 w-6" />
+              <span className="hidden md:inline">Street</span>
+            </button>
+            <button
+              className={`btn btn-sm join-item ${isStreet ? "" : "btn-active"}`}
+              onClick={() => setIsStreet(false)}
+            >
+              <GlobeEuropeAfricaIcon className="h-6 w-6" />
+              <span className="hidden md:inline">Satellite</span>
+            </button>
+          </div>
         </div>
       </div>
       <SideBar
-        openPanel = {openPanel}
-        setOpenPanel = {setOpenPanel}
-        selectedFruit = {selectedFruit}
-        selectedReviews = {selectedReviews}
-        avgRating = {avgRating}
-        reviewCount = {reviewCount}
-        refreshReviewData = {refreshReviewData}
-        reviewModal = {reviewModal}
-        selectedLocation = {selectedLocation}
+        openPanel={openPanel}
+        setOpenPanel={setOpenPanel}
+        selectedFruit={selectedFruit}
+        selectedReviews={selectedReviews}
+        avgRating={avgRating}
+        reviewCount={reviewCount}
+        refreshReviewData={refreshReviewData}
+        reviewModal={reviewModal}
+        selectedLocation={selectedLocation}
       />
       <div></div>
 

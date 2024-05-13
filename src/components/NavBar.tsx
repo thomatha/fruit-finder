@@ -22,13 +22,14 @@ const NavBar = () => {
           Fruit Finder
         </a>
       </div>
-      <UserBadge />
       <div className="flex-none">
         <ul className="menu menu-horizontal px-1">
           <li>
             <details>
-              <summary>Main Menu</summary>
-              <ul className="p-2 bg-base-100 rounded-t-none">
+              <summary className="py-1">
+                <UserBadge />
+              </summary>
+              <ul className="p-2 bg-base-100 rounded-t-none min-w-40 end-0">
                 <li>
                 {user ? (
                     <Link href="/">Sign Out</Link>
