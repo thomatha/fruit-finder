@@ -14,17 +14,20 @@ import useNearbyFruits from "@/hooks/useNearbyFruits";
 import useSpecificFruit from "@/hooks/useSpecificFruit";
 import useLocationReviews from "@/hooks/useLocationReviews";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { FruitLocation } from "@/types";
+import { Fruit, FruitLocation } from "@/types";
 import fruitIcon from "@/utils/fruitIcon";
 import AddModal from "./AddModal";
 import SideBar from "./SideBar";
+import { toast } from "react-toastify";
+import SearchBar from "./SearchBar";
+import FruitFilter from "./FruitFilter";
 
 export default function FruitMap({ token }) {
   const mapRef = useRef<MapRef>();
   const state = useGeolocation();
   const [modalOpen, setModalOpen] = useState(false);
   const { status } = useSession();
-  const [fruits, setBounds] = useNearbyFruits();
+  const [fruits, setBounds, setFruitFilter] = useNearbyFruits();
   const [isStreet, setIsStreet] = useState(true);
   const [selectedFruit, setSelectedFruit] = useSpecificFruit();
   const [selectedReviews, avgRating, reviewCount, setSelectedReviews] =
@@ -70,6 +73,45 @@ export default function FruitMap({ token }) {
     }, 0);
   };
 
+  const retrieveSearch = (e: any) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    let searchTxt = String(formData.get("searchText"));
+    if (searchTxt != "") {
+      const fetchSearch = async () => {
+        const searchResponse = await fetch(
+          `https://api.mapbox.com/search/searchbox/v1/suggest?q=${searchTxt}&types=place,country,region,city&access_token=${token}&session_token=${token}`
+        );
+        const searchData = await searchResponse.json();
+        if (!searchResponse.ok) {
+          toast.error("Error retreiving your search suggestions.");
+        } else {
+          if (searchData.suggestions.length > 0) {
+            let suggestionId = searchData.suggestions[0].mapbox_id;
+            const fetchSuggestion = async () => {
+              const suggestionResponse = await fetch(
+                `https://api.mapbox.com/search/searchbox/v1/retrieve/${suggestionId}?access_token=${token}&session_token=${token}`
+              );
+              const suggestionData = await suggestionResponse.json();
+              if (!suggestionResponse.ok) {
+                toast.error("Error retreiving your search location.");
+              } else {
+                if (suggestionData) {
+                  let coords = suggestionData.features[0].properties.bbox;
+                  mapRef.current?.fitBounds(coords);
+                }
+              }
+            };
+            fetchSuggestion();
+          } else {
+            toast.error("No locations found. Please try a new search.");
+          }
+        }
+      };
+      fetchSearch();
+    }
+  };
+
   return (
     <>
       <div>
@@ -95,6 +137,12 @@ export default function FruitMap({ token }) {
             setOpenPanel(false);
           }}
         >
+          <SearchBar onSearchSubmit={retrieveSearch} />
+          <FruitFilter
+            handleFilter={(fruit: Fruit) => {
+              setFruitFilter(fruit.id === -1 ? undefined : fruit);
+            }}
+          />
           {fruits.map((fruitLocation: FruitLocation) => (
             <Fragment key={fruitLocation.id}>
               <Marker

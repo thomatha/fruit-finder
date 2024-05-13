@@ -1,9 +1,11 @@
-import { type FruitLocation } from "@/types";
+import { Fruit, type FruitLocation } from "@/types";
 import { useEffect, useState } from "react";
 
 type NearbyFruits = [
   FruitLocation[],
-  (n: number, e: number, w: number, s: number) => void
+  (n: number, e: number, w: number, s: number) => void,
+  (filter: Fruit) => void,
+  Fruit
 ];
 
 function useNearbyFruits(): NearbyFruits {
@@ -12,6 +14,7 @@ function useNearbyFruits(): NearbyFruits {
   const [north, setNorth] = useState<number>(90);
   const [west, setWest] = useState<number>(-180);
   const [east, setEast] = useState<number>(180);
+  const [filter, setFilter] = useState<Fruit>();
 
   // This useEffect with empty [] gets called once when the component is created
   useEffect(() => {
@@ -43,7 +46,11 @@ function useNearbyFruits(): NearbyFruits {
     setSouth(s);
   };
 
-  return [fruits, setBounds];
+  // If there is a filter, return filtered list of fruit locations, else all
+  const filteredFruit = filter
+    ? fruits.filter((item: FruitLocation) => item.fruit === filter.name)
+    : fruits;
+  return [filteredFruit, setBounds, setFilter, filter];
 }
 
 export default useNearbyFruits;
