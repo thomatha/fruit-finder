@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { Fragment, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useGeolocation } from "@uidotdev/usehooks";
 import Map, { Marker, type MapRef } from "react-map-gl";
@@ -96,15 +96,13 @@ export default function FruitMap({ token }) {
           }}
         >
           {fruits.map((fruitLocation: FruitLocation) => (
-            <>
+            <Fragment key={fruitLocation.id}>
               <Marker
-                key={`${fruitLocation.id}-bg`}
                 latitude={fruitLocation.latitude}
                 longitude={fruitLocation.longitude}
                 color="white"
               />
               <Marker
-                key={fruitLocation.id} //TODO: this is causing a lot of Warning: Each child in a list should have a unique "key" prop. errors in the log
                 latitude={fruitLocation.latitude}
                 longitude={fruitLocation.longitude}
                 offset={[0, -20]}
@@ -118,7 +116,7 @@ export default function FruitMap({ token }) {
                   {fruitIcon(fruitLocation.fruit)}
                 </span>
               </Marker>
-            </>
+            </Fragment>
           ))}
           <Marker longitude={state.longitude} latitude={state.latitude} />
         </Map>
