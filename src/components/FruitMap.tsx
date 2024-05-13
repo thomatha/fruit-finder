@@ -18,17 +18,16 @@ import { FruitLocation } from "@/types";
 import fruitIcon from "@/utils/fruitIcon";
 import AddModal from "./AddModal";
 import SideBar from "./SideBar";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 import SearchBar from "./SearchBar";
 import FruitFilter from "./FruitFilter";
-import { Fruit } from "@/types";
 
 export default function FruitMap({ token }) {
   const mapRef = useRef<MapRef>();
   const state = useGeolocation();
   const [modalOpen, setModalOpen] = useState(false);
   const { status } = useSession();
-  const [fruits, setBounds] = useNearbyFruits();
+  const [fruits, setBounds, setFruitFilter] = useNearbyFruits();
   const [isStreet, setIsStreet] = useState(true);
   const [selectedFruit, setSelectedFruit] = useSpecificFruit();
   const [selectedReviews, avgRating, reviewCount, setSelectedReviews] =
@@ -36,7 +35,6 @@ export default function FruitMap({ token }) {
   const [openPanel, setOpenPanel] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(0);
   const [forceRefresh, setForceRefresh] = useState(false);
-  const [fruitFilter, setFruitFilter] = useState<Fruit>({ id: -1, name: 'Fruit Filter' });
 
   if (state.loading) {
     // TODO show spinner or loading indicator
@@ -53,20 +51,7 @@ export default function FruitMap({ token }) {
       bounds?._ne.lat,
       bounds?._ne.lng,
       bounds?._sw.lng,
-      bounds?._sw.lat,
-      fruitFilter.id
-    );
-  };
-
-  const updateFilter = (newFruit: Fruit) => {
-    setFruitFilter(newFruit);
-    const bounds = mapRef.current?.getBounds();
-    setBounds(
-      bounds?._ne.lat,
-      bounds?._ne.lng,
-      bounds?._sw.lng,
-      bounds?._sw.lat,
-      newFruit.id
+      bounds?._sw.lat
     );
   };
 
@@ -90,9 +75,9 @@ export default function FruitMap({ token }) {
 
   const retrieveSearch = (e: any) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget)
+    const formData = new FormData(e.currentTarget);
     let searchTxt = String(formData.get("searchText"));
-    if (searchTxt != '') {
+    if (searchTxt != "") {
       const fetchSearch = async () => {
         const searchResponse = await fetch(
           `https://api.mapbox.com/search/searchbox/v1/suggest?q=${searchTxt}&types=place,country,region,city&access_token=${token}&session_token=${token}`
@@ -100,10 +85,9 @@ export default function FruitMap({ token }) {
         const searchData = await searchResponse.json();
         if (!searchResponse.ok) {
           toast.error("Error retreiving your search suggestions.");
-        }
-        else {
+        } else {
           if (searchData.suggestions.length > 0) {
-            let suggestionId = searchData.suggestions[0].mapbox_id
+            let suggestionId = searchData.suggestions[0].mapbox_id;
             const fetchSuggestion = async () => {
               const suggestionResponse = await fetch(
                 `https://api.mapbox.com/search/searchbox/v1/retrieve/${suggestionId}?access_token=${token}&session_token=${token}`
@@ -111,8 +95,7 @@ export default function FruitMap({ token }) {
               const suggestionData = await suggestionResponse.json();
               if (!suggestionResponse.ok) {
                 toast.error("Error retreiving your search location.");
-              }
-              else {
+              } else {
                 if (suggestionData) {
                   let coords = suggestionData.features[0].properties.bbox;
                   mapRef.current?.fitBounds(coords);
@@ -120,8 +103,7 @@ export default function FruitMap({ token }) {
               }
             };
             fetchSuggestion();
-          }
-          else {
+          } else {
             toast.error("No locations found. Please try a new search.");
           }
         }
@@ -156,7 +138,7 @@ export default function FruitMap({ token }) {
           }}
         >
           <SearchBar onSearchSubmit={retrieveSearch} />
-          <FruitFilter handleFilter={updateFilter}/>
+          <FruitFilter handleFilter={(fruit) => setFruitFilter(fruit)} />
           {fruits.map((fruitLocation: FruitLocation) => (
             <>
               <Marker
