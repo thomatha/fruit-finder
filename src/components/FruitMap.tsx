@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useGeolocation } from "@uidotdev/usehooks";
 import Map, { Marker, type MapRef } from "react-map-gl";
@@ -24,7 +24,7 @@ import FruitFilter from "./FruitFilter";
 
 export default function FruitMap({ token }) {
   const mapRef = useRef<MapRef>();
-  const state = useGeolocation();
+  const state = useGeolocation({ enableHighAccuracy: true });
   const [modalOpen, setModalOpen] = useState(false);
   const { status } = useSession();
   const [fruits, setBounds, setFruitFilter] = useNearbyFruits();
@@ -35,6 +35,13 @@ export default function FruitMap({ token }) {
   const [openPanel, setOpenPanel] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(0);
   const [forceRefresh, setForceRefresh] = useState(false);
+  const [followMe, setFollowMe] = useState(true);
+
+  useEffect(() => {
+    if (followMe) {
+      mapRef.current?.setCenter([state.longitude, state.latitude]);
+    }
+  }, [state]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (state.loading) {
     // TODO show spinner or loading indicator
@@ -135,6 +142,7 @@ export default function FruitMap({ token }) {
           onZoomEnd={updateBounds}
           onDragStart={() => {
             setOpenPanel(false);
+            setFollowMe(false);
           }}
         >
           <SearchBar onSearchSubmit={retrieveSearch} />
@@ -178,6 +186,7 @@ export default function FruitMap({ token }) {
               mapRef.current?.flyTo({
                 center: [state.longitude, state.latitude],
               });
+              setFollowMe(true);
             }}
           >
             <MapPinIcon className="h-6 w-6" />
