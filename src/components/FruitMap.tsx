@@ -18,6 +18,7 @@ import { Fruit, FruitLocation } from "@/types";
 import fruitIcon from "@/utils/fruitIcon";
 import AddModal from "./AddModal";
 import EditModal from "./EditModal";
+import DeleteModal from "./DeleteModal";
 import SideBar from "./SideBar";
 import { toast } from "react-toastify";
 import SearchBar from "./SearchBar";
@@ -26,8 +27,9 @@ import FruitFilter from "./FruitFilter";
 export default function FruitMap({ token }) {
   const mapRef = useRef<MapRef>();
   const state = useGeolocation();
-  const [modalOpen, setModalOpen] = useState(false);
+  const [addModalOpen, setAddModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const { status } = useSession();
   const [fruits, setBounds, setFruitFilter] = useNearbyFruits();
   const [isStreet, setIsStreet] = useState(true);
@@ -191,7 +193,7 @@ export default function FruitMap({ token }) {
           {status === "authenticated" ? (
             <button
               className="btn btn-primary"
-              onClick={() => setModalOpen(true)}
+              onClick={() => setAddModalOpen(true)}
             >
               <PlusCircleIcon className="h-6 w-6" />{" "}
               <span className="hidden md:inline">Add Fruit</span>
@@ -231,21 +233,22 @@ export default function FruitMap({ token }) {
         reviewModal={reviewModal}
         selectedLocation={selectedLocation}
         setEditModalOpen={setEditModalOpen}
+        setDeleteModalOpen={setDeleteModalOpen}
       />
       <div></div>
 
       {/* Conditionally render modal so state is reset each time opened */}
-      {modalOpen ? (
+      {addModalOpen ? (
         <AddModal
           token={token}
           lat={state.latitude}
           lng={state.longitude}
           onAdd={() => {
-            setModalOpen(false);
+            setAddModalOpen(false);
             updateBounds();
             // TODO notify user of successful add
           }}
-          onClose={() => setModalOpen(false)}
+          onClose={() => setAddModalOpen(false)}
         />
       ) : (
         <></>
@@ -265,6 +268,22 @@ export default function FruitMap({ token }) {
             // TODO notify user of successful edit
           }}
           onClose={() => setEditModalOpen(false)}
+        />
+      ) : (
+        <></>
+      )}
+
+      {deleteModalOpen ? (
+        <DeleteModal
+          tree={selectedFruit}
+          onDelete={() => {
+            setDeleteModalOpen(false);
+            setOpenPanel(false);
+            setSelectedFruit(null);
+            updateBounds();
+            // TODO notify user of successful delete
+          }}
+          onClose={() => setDeleteModalOpen(false)}
         />
       ) : (
         <></>

@@ -21,6 +21,7 @@ const SideBar = ({
   reviewModal,
   selectedLocation,
   setEditModalOpen,
+  setDeleteModalOpen,
 }) => {
   const [panelSection, setPanelSection] = useState(0);
   const { data } = useSession();
@@ -91,13 +92,19 @@ const SideBar = ({
               <div>
                 <div><span className="font-semibold text-xs">(You submitted this fruit tree)</span></div>
                 <div>
-                    <button className="btn btn-sm mb-2" onClick={() => {setEditModalOpen(true)}}>
+                    <button className="btn btn-sm mb-2" onClick={() => {
+                        setEditModalOpen(true);
+                        setDeleteModalOpen(false);
+                    }}>
                         <PencilSquareIcon className="h-6 w-6" />{" "}
                         <span className="hidden md:inline">Edit</span>
                     </button>
                 </div>
                 <div>
-                    <button className="btn btn-sm">
+                    <button className="btn btn-sm" onClick={() => {
+                        setDeleteModalOpen(true);
+                        setEditModalOpen(false);
+                    }}>
                         <TrashIcon className="h-6 w-6" />{" "}
                         <span className="hidden md:inline">Delete</span>
                     </button>
