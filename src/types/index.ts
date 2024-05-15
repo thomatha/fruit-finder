@@ -13,6 +13,7 @@ export type FruitLocationDetail = {
   latitude: number;
   longitude: number;
   img_link: string;
+  user_id: string;
 };
 
 export type Fruit = {

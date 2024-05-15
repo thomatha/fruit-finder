@@ -17,6 +17,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import { Fruit, FruitLocation } from "@/types";
 import fruitIcon from "@/utils/fruitIcon";
 import AddModal from "./AddModal";
+import EditModal from "./EditModal";
 import SideBar from "./SideBar";
 import { toast } from "react-toastify";
 import SearchBar from "./SearchBar";
@@ -26,6 +27,7 @@ export default function FruitMap({ token }) {
   const mapRef = useRef<MapRef>();
   const state = useGeolocation();
   const [modalOpen, setModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
   const { status } = useSession();
   const [fruits, setBounds, setFruitFilter] = useNearbyFruits();
   const [isStreet, setIsStreet] = useState(true);
@@ -135,6 +137,7 @@ export default function FruitMap({ token }) {
           onZoomEnd={updateBounds}
           onDragStart={() => {
             setOpenPanel(false);
+            setSelectedFruit(null);
           }}
         >
           <SearchBar onSearchSubmit={retrieveSearch} />
@@ -227,6 +230,7 @@ export default function FruitMap({ token }) {
         refreshReviewData={refreshReviewData}
         reviewModal={reviewModal}
         selectedLocation={selectedLocation}
+        setEditModalOpen={setEditModalOpen}
       />
       <div></div>
 
@@ -242,6 +246,25 @@ export default function FruitMap({ token }) {
             // TODO notify user of successful add
           }}
           onClose={() => setModalOpen(false)}
+        />
+      ) : (
+        <></>
+      )}
+
+      {editModalOpen ? (
+        <EditModal
+          token={token}
+          lat={state.latitude}
+          lng={state.longitude}
+          tree={selectedFruit}
+          onEdit={() => {
+            setEditModalOpen(false);
+            setOpenPanel(false);
+            setSelectedFruit(null);
+            updateBounds();
+            // TODO notify user of successful edit
+          }}
+          onClose={() => setEditModalOpen(false)}
         />
       ) : (
         <></>

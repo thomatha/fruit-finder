@@ -7,23 +7,23 @@ import {
 import fruitIcon from "@/utils/fruitIcon";
 import AddMap from "./AddMap";
 import useFruits from "@/hooks/useFruits";
-import useAddFruit from "@/hooks/useAddFruit";
-import { Fruit } from "@/types";
-import { useSession } from "next-auth/react";
+import useEditFruit from "@/hooks/useEditFruit";
+import { Fruit, FruitLocationDetail } from "@/types";
 
-export default function AddModal({ token, lat, lng, onClose, onAdd }) {
+export default function EditModal({ token, lat, lng, onClose, onEdit, tree }) {
   const [fruitType, setFruitType] = useState<Fruit>();
   const [latitude, setLatitude] = useState(lat);
   const [longitude, setLongitude] = useState(lng);
+  const [oldTree, setOldTree] = useState<FruitLocationDetail | null>(tree);
   const [fruits, loading] = useFruits();
-  const [addFruit, saving, error] = useAddFruit();
+  const [editFruit, saving, error] = useEditFruit();
   const [file, setFile] = useState<File | null>(null);
   const [notes, setNotes] = useState<string | null>();
-  const { data } = useSession();
+  const [updateLocation, setUpdateLocation] = useState(false);
 
   async function saveFruit() {
-    await addFruit(fruitType, latitude, longitude, notes, file, data?.user?.id);
-    onAdd();
+    await editFruit(oldTree.id, fruitType, latitude, longitude, notes, file);
+    onEdit();
   }
 
   return (
@@ -37,11 +37,11 @@ export default function AddModal({ token, lat, lng, onClose, onAdd }) {
             ✕
           </button>
         </form>
-        <h3 className="font-bold text-lg mb-4">Add Fruit</h3>
+        <h3 className="font-bold text-lg mb-4">Edit Fruit</h3>
         {error ? (
           <div role="alert" className="alert alert-error mb-4">
             <ExclamationCircleIcon className="h-6 w-6" />
-            <span>Error! Unable to add fruit.</span>
+            <span>Error! Unable to edit fruit.</span>
           </div>
         ) : (
           <></>
@@ -53,11 +53,22 @@ export default function AddModal({ token, lat, lng, onClose, onAdd }) {
           longitude={longitude}
           token={token}
           onClick={(lt, ln) => {
-            setLatitude(lt);
-            setLongitude(ln);
+            if(updateLocation) {
+              setLatitude(lt);
+              setLongitude(ln);
+            }
           }}
         />
-
+          <input type='radio' id='update-loc' name='loc-choice' defaultChecked onClick={() => {
+            setUpdateLocation(true);
+          }} />
+          <label htmlFor='update-loc'>{' '}Update Location</label><br/>
+          <input type='radio' id='keep-loc' name='loc-choice' className="mt-2" onClick={() => {
+            setLatitude(oldTree.latitude);
+            setLongitude(oldTree.longitude);
+            setUpdateLocation(false);
+          }} />
+          <label htmlFor='keep-loc'>{' '}Keep Location</label>
         <select
           disabled={loading}
           className="select select-bordered select-lg w-full mt-3"
@@ -67,6 +78,7 @@ export default function AddModal({ token, lat, lng, onClose, onAdd }) {
             setFruitType(fruit);
           }}
         >
+          {/*TODO: Pre-populate this selector with the selected tree's assigned fruit*/}
           <option disabled selected>
             What type of fruit?
           </option>
@@ -79,8 +91,8 @@ export default function AddModal({ token, lat, lng, onClose, onAdd }) {
         <textarea
           className="textarea textarea-bordered w-full mt-3"
           maxLength={1000}
-          placeholder="Notes (Optional)"
           onChange={(e) => setNotes(e.target.value)}
+          defaultValue={oldTree.description}
         ></textarea>
         <div className="mt-3 flex justify-center">
           <input
@@ -109,7 +121,7 @@ export default function AddModal({ token, lat, lng, onClose, onAdd }) {
             ) : (
               <CameraIcon className="w-8 h-8" />
             )}
-            {file ? "Change Photo" : "Add Photo"}
+            {file ? "Change Photo" : "Update Photo"}
           </button>
         </div>
         <div className="modal-action">
@@ -120,7 +132,7 @@ export default function AddModal({ token, lat, lng, onClose, onAdd }) {
               saveFruit();
             }}
           >
-            {saving ? "Saving..." : "Add"}
+            {saving ? "Saving..." : "Edit"}
           </button>
           <button className="btn btn-outline" onClick={() => onClose()}>
             Cancel
