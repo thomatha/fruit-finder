@@ -1,5 +1,8 @@
 import { sql } from '@vercel/postgres';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from "next-auth/next";
+// import { authOptions } from "../auth/[...nextauth]/route";
+import Auth0Provider from "next-auth/providers/auth0";
 
 /**
  * GET endpoint for fetching fruit tree location data. All properties are URL search parameters
@@ -250,6 +253,55 @@ export async function POST(request: Request) {
 
     if(!data || !data.name || !data.latitude || !data.longitude || !data.fruit_id || !data.user_id) {
         return NextResponse.json({ error: 'The request body is missing at least one of the required attributes' }, { status: 400 });
+    }
+
+    /* 
+    /  Exporting the authOptions from [.../nextauth] and passing them in as a param always caused a type mismatch. Unsure why
+    /  Reproducing them here in full instead to get the server session.
+    /  This isn't ideal because changing them in one place means changing them in two, but it does lock down the endpoint.
+    */
+    const session = await getServerSession({
+        providers: [
+          Auth0Provider({
+            clientId: process.env.AUTH0_CLIENT_ID as string,
+            clientSecret: process.env.AUTH0_CLIENT_SECRET as string,
+            issuer: process.env.AUTH0_ISSUER,
+          }),
+        ],
+        callbacks: {
+          async jwt({ token, user, session }) {
+            // Persist the OAuth access_token and or the user id to the token right after signin
+            if (user) {
+              token.id = user.id
+            }
+      
+            return token
+          }
+          ,
+          async session({ session, token }) {
+            // Send properties to the client, like an access_token and user id from a provider.
+            session.user.id = token.id;
+            let image = session.user.image ? session.user.image : null;
+            try {
+              const date = new Date();
+              await sql`
+                  INSERT INTO Users (id, name, email, image, created) 
+                  VALUES (${session.user.id}, ${session.user.name}, ${session.user.email}, ${image}, ${date.toJSON()}) 
+                  ON CONFLICT (id) 
+                  DO UPDATE 
+                  SET name = ${session.user.name}, email = ${session.user.email}, image = ${image};
+                  `;
+            } catch (e) {
+              console.error(e);
+            }
+            return session;
+          }
+        }
+    });
+
+    // Check that session exists, and that the frontend session matches server session
+    if(!session || !session.user || data.user_id !== session.user.id) {
+        return NextResponse.json({error: 'You are not authorized to POST to this resource'}, {status: 401});
     }
 
     if(!data.description && !data.s3_img_link) {
