@@ -1,5 +1,7 @@
 import { sql } from '@vercel/postgres';
 import { NextResponse } from 'next/server';
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "../auth/authOptions";
 
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
@@ -94,6 +96,13 @@ export async function POST(request: Request) {
     const data = await request.json();
     if (!data || !data.treeId || !data.userId || !data.rating || !data.text) {
         return NextResponse.json({ error: 'The request body is missing at least one of the required attributes' }, { status: 400 });
+    }
+
+    const session = await getServerSession(authOptions);
+
+    // Check that session exists, and that the frontend session matches server session
+    if(!session || !session.user || data.user_id !== session.user.id) {
+        return NextResponse.json({error: 'You are not authorized to POST to this resource'}, {status: 401});
     }
 
     try {
