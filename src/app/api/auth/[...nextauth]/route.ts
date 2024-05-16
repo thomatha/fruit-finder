@@ -1,8 +1,8 @@
-import NextAuth from "next-auth";
+import NextAuth, { AuthOptions } from "next-auth";
 import Auth0Provider from "next-auth/providers/auth0";
 import { sql } from '@vercel/postgres';
 
-const handler = NextAuth({
+const authOptions: AuthOptions = {
   providers: [
     Auth0Provider({
       clientId: process.env.AUTH0_CLIENT_ID as string,
@@ -39,6 +39,8 @@ const handler = NextAuth({
       return session;
     }
   }
-});
+};
 
-export { handler as GET, handler as POST };
+const handler = NextAuth(authOptions);
+
+export { handler as GET, handler as POST, authOptions };
