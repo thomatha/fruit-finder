@@ -38,7 +38,6 @@ const SideBar = ({
     >
       {/* TODO:
        * Remove panel close button, or stick it to bottom of panel (with relative positioning?)
-       * Edit button - probably far easier if this takes user to a route w/ a form. Only visible if user created this location
        */}
       <div className="panel-container grid grid-cols-1 gap-4 content-evenly text-center">
         {selectedFruit && selectedFruit.img_link ? (

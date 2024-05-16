@@ -10,6 +10,7 @@ export type FruitLocationDetail = {
   name: string;
   description: string;
   fruit: string;
+  fruit_id: number;
   latitude: number;
   longitude: number;
   img_link: string;

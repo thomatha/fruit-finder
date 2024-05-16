@@ -55,6 +55,7 @@ export async function GET(request: Request) {
                     ftl.s3_img_link,
                     ftl.user_id,
                     f.name AS fruit_name, 
+                    f.id AS fruit_id,
                     f.color 
                 FROM 
                     fruit_tree_locations ftl
@@ -85,7 +86,7 @@ export async function GET(request: Request) {
                             ftl.latitude, 
                             ftl.longitude,
                             ftl.user_id,
-                            f.idk AS fruit_id,
+                            f.id AS fruit_id,
                             f.name AS fruit_name, 
                             f.color,
                             ( ${earthRadiusMiles} * acos( cos( radians( ${latitude} ) ) * 
@@ -118,7 +119,7 @@ export async function GET(request: Request) {
                             ftl.latitude, 
                             ftl.longitude, 
                             ftl.user_id,
-                            f.idk AS fruit_id,
+                            f.id AS fruit_id,
                             f.name AS fruit_name, 
                             f.color,
                             ( ${earthRadiusMiles} * acos( cos( radians( ${latitude} ) ) * 
@@ -153,6 +154,7 @@ export async function GET(request: Request) {
                         ftl.longitude, 
                         ftl.user_id,
                         f.name AS fruit_name, 
+                        f.id AS fruit_id,
                         f.color 
                     FROM 
                         fruit_tree_locations ftl
@@ -176,6 +178,7 @@ export async function GET(request: Request) {
                         ftl.longitude,
                         ftl.user_id,
                         f.name AS fruit_name, 
+                        f.id AS fruit_id,
                         f.color 
                     FROM 
                         fruit_tree_locations ftl
@@ -200,6 +203,7 @@ export async function GET(request: Request) {
                         ftl.longitude, 
                         ftl.user_id,
                         f.name AS fruit_name, 
+                        f.id AS fruit_id,
                         f.color 
                     FROM 
                         fruit_tree_locations ftl
@@ -220,6 +224,7 @@ export async function GET(request: Request) {
                         ftl.longitude, 
                         ftl.user_id,
                         f.name AS fruit_name, 
+                        f.id AS fruit_id,
                         f.color 
                     FROM 
                         fruit_tree_locations ftl

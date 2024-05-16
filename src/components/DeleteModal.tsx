@@ -3,12 +3,12 @@ import { ExclamationCircleIcon } from "@heroicons/react/16/solid";
 import useDeleteFruit from "@/hooks/useDeleteFruit";
 import { FruitLocationDetail } from "@/types";
 
-export default function EditModal({ onClose, onDelete, tree }) {
+export default function EditModal({ tree, onDelete, onClose }) {
   const [oldTree, setOldTree] = useState<FruitLocationDetail | null>(tree);
   const [deleteFruit, saving, error] = useDeleteFruit();
 
   async function removeFruit() {
-    await deleteFruit(oldTree.id);
+    deleteFruit(oldTree.id);
     onDelete();
   }
 

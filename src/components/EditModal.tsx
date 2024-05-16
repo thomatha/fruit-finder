@@ -10,19 +10,23 @@ import useFruits from "@/hooks/useFruits";
 import useEditFruit from "@/hooks/useEditFruit";
 import { Fruit, FruitLocationDetail } from "@/types";
 
-export default function EditModal({ token, lat, lng, onClose, onEdit, tree }) {
-  const [fruitType, setFruitType] = useState<Fruit>();
-  const [latitude, setLatitude] = useState(lat);
-  const [longitude, setLongitude] = useState(lng);
+export default function EditModal({ token, tree, onEdit, onClose }) {
+  const [latitude, setLatitude] = useState(0);
+  const [longitude, setLongitude] = useState(0);
   const [oldTree, setOldTree] = useState<FruitLocationDetail | null>(tree);
   const [fruits, loading] = useFruits();
+  const [fruitType, setFruitType] = useState<Fruit>();
   const [editFruit, saving, error] = useEditFruit();
   const [file, setFile] = useState<File | null>(null);
   const [notes, setNotes] = useState<string | null>();
-  const [updateLocation, setUpdateLocation] = useState(false);
 
   async function saveFruit() {
-    await editFruit(oldTree.id, fruitType, latitude, longitude, notes, file);
+    let fruitToPut = fruitType ? fruitType : {id: oldTree.fruit_id, name: oldTree.fruit};
+    let latToPut = latitude ? latitude : oldTree.latitude;
+    let lngToPut = longitude ? longitude: oldTree.longitude;
+    let notesToPut = notes ? notes : oldTree.description;
+
+    editFruit(oldTree.id, fruitToPut, latToPut, lngToPut, notesToPut, file);
     onEdit();
   }
 
@@ -49,44 +53,38 @@ export default function EditModal({ token, lat, lng, onClose, onEdit, tree }) {
 
         <AddMap
           fruit={fruitType?.name}
-          latitude={latitude}
-          longitude={longitude}
+          latitude={latitude ? latitude: oldTree.latitude}
+          longitude={longitude? longitude: oldTree.longitude}
           token={token}
           onClick={(lt, ln) => {
-            if(updateLocation) {
-              setLatitude(lt);
-              setLongitude(ln);
-            }
+            setLatitude(lt);
+            setLongitude(ln);
           }}
         />
-          <input type='radio' id='update-loc' name='loc-choice' defaultChecked onClick={() => {
-            setUpdateLocation(true);
-          }} />
-          <label htmlFor='update-loc'>{' '}Update Location</label><br/>
-          <input type='radio' id='keep-loc' name='loc-choice' className="mt-2" onClick={() => {
-            setLatitude(oldTree.latitude);
-            setLongitude(oldTree.longitude);
-            setUpdateLocation(false);
-          }} />
-          <label htmlFor='keep-loc'>{' '}Keep Location</label>
         <select
           disabled={loading}
           className="select select-bordered select-lg w-full mt-3"
           value={fruitType?.id}
           onChange={(e) => {
-            const fruit = fruits.find((f) => f.id == parseInt(e.target.value));
+            const fruit = fruits.find((f) => f.id === parseInt(e.target.value));
             setFruitType(fruit);
           }}
         >
-          {/*TODO: Pre-populate this selector with the selected tree's assigned fruit*/}
-          <option disabled selected>
-            What type of fruit?
-          </option>
-          {fruits.map((fruit: Fruit) => (
-            <option key={fruit.id} value={fruit.id}>
-              {fruitIcon(fruit.name)} {fruit.name}
-            </option>
-          ))}
+          {fruits.map((fruit: Fruit) => {
+              if(oldTree.fruit === fruit.name) {
+                return (
+                  <option key={fruit.id} value={fruit.id} selected>
+                    {fruitIcon(fruit.name)} {fruit.name}
+                  </option>
+                )
+              } else {
+                return (
+                  <option key={fruit.id} value={fruit.id}>
+                    {fruitIcon(fruit.name)} {fruit.name}
+                  </option>
+                )
+              }
+          })}
         </select>
         <textarea
           className="textarea textarea-bordered w-full mt-3"
@@ -127,7 +125,7 @@ export default function EditModal({ token, lat, lng, onClose, onEdit, tree }) {
         <div className="modal-action">
           <button
             className="btn btn-primary"
-            disabled={!fruitType || saving}
+            disabled={saving}
             onClick={() => {
               saveFruit();
             }}

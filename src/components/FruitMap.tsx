@@ -161,6 +161,7 @@ export default function FruitMap({ token }) {
                 offset={[0, -20]}
                 // Unsure about this behavior. Could see user wanting to keep panel on screen as they navigate around
                 onClick={() => {
+                  setSelectedFruit(null);
                   setOpenPanel(false);
                   panelLoad(fruitLocation.id);
                 }}
@@ -223,7 +224,7 @@ export default function FruitMap({ token }) {
         </div>
       </div>
       <SideBar
-        openPanel={openPanel}
+        openPanel={openPanel && selectedFruit}
         setOpenPanel={setOpenPanel}
         selectedFruit={selectedFruit}
         selectedReviews={selectedReviews}
@@ -257,14 +258,12 @@ export default function FruitMap({ token }) {
       {editModalOpen ? (
         <EditModal
           token={token}
-          lat={state.latitude}
-          lng={state.longitude}
           tree={selectedFruit}
           onEdit={() => {
             setEditModalOpen(false);
+            updateBounds();
             setOpenPanel(false);
             setSelectedFruit(null);
-            updateBounds();
             // TODO notify user of successful edit
           }}
           onClose={() => setEditModalOpen(false)}
@@ -278,9 +277,9 @@ export default function FruitMap({ token }) {
           tree={selectedFruit}
           onDelete={() => {
             setDeleteModalOpen(false);
+            updateBounds();
             setOpenPanel(false);
             setSelectedFruit(null);
-            updateBounds();
             // TODO notify user of successful delete
           }}
           onClose={() => setDeleteModalOpen(false)}
