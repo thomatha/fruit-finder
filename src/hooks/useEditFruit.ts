@@ -4,30 +4,30 @@ const AWS_BUCKET_NAME = "fruitfinder";
 const AWS_REGION = "us-east-2";
 
 // This is the hook return type
-type AddFruitData = [
+type EditFruitData = [
   (
+    tree: number,
     fruit: Fruit,
     latitude: number,
     longitude: number,
     notes: string,
-    file: File,
-    user_id: string,
+    file: File
   ) => void,
   boolean,
   boolean
 ];
 
-export default function useAddFruit(): AddFruitData {
+export default function useEditFruit(): EditFruitData {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(false);
 
-  async function addFruit(
+  async function editFruit(
+    tree: number,
     fruit: Fruit,
     latitude: number,
     longitude: number,
     notes: string,
-    file: File,
-    user_id: string,
+    file: File
   ): Promise<void> {
     setSaving(true);
 
@@ -65,7 +65,6 @@ export default function useAddFruit(): AddFruitData {
       }
     }
 
-    // TODO const s3_img_link = await uploadImage(file);
 
     const data = {
       name: fruit.name,
@@ -74,11 +73,10 @@ export default function useAddFruit(): AddFruitData {
       longitude,
       description: notes,
       s3_img_link,
-      user_id,
     };
     try {
-      const response = await fetch("/api/fruit_locations", {
-        method: "POST", // Specify the HTTP method as POST
+      const response = await fetch(`/api/fruit_locations?id=${tree}`, {
+        method: "PUT", // Specify the HTTP method as PUT
         headers: {
           "Content-Type": "application/json", // Set the Content-Type header to indicate JSON data
         },
@@ -93,5 +91,5 @@ export default function useAddFruit(): AddFruitData {
     setSaving(false);
   }
 
-  return [addFruit, saving, error];
+  return [editFruit, saving, error];
 }

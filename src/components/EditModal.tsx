@@ -7,23 +7,27 @@ import {
 import fruitIcon from "@/utils/fruitIcon";
 import AddMap from "./AddMap";
 import useFruits from "@/hooks/useFruits";
-import useAddFruit from "@/hooks/useAddFruit";
-import { Fruit } from "@/types";
-import { useSession } from "next-auth/react";
+import useEditFruit from "@/hooks/useEditFruit";
+import { Fruit, FruitLocationDetail } from "@/types";
 
-export default function AddModal({ token, lat, lng, onClose, onAdd }) {
-  const [fruitType, setFruitType] = useState<Fruit>();
-  const [latitude, setLatitude] = useState(lat);
-  const [longitude, setLongitude] = useState(lng);
+export default function EditModal({ token, tree, onEdit, onClose }) {
+  const [latitude, setLatitude] = useState(0);
+  const [longitude, setLongitude] = useState(0);
+  const [oldTree, setOldTree] = useState<FruitLocationDetail | null>(tree);
   const [fruits, loading] = useFruits();
-  const [addFruit, saving, error] = useAddFruit();
+  const [fruitType, setFruitType] = useState<Fruit>();
+  const [editFruit, saving, error] = useEditFruit();
   const [file, setFile] = useState<File | null>(null);
   const [notes, setNotes] = useState<string | null>();
-  const { data } = useSession();
 
   async function saveFruit() {
-    await addFruit(fruitType, latitude, longitude, notes, file, data?.user?.id);
-    onAdd();
+    let fruitToPut = fruitType ? fruitType : {id: oldTree.fruit_id, name: oldTree.fruit};
+    let latToPut = latitude ? latitude : oldTree.latitude;
+    let lngToPut = longitude ? longitude: oldTree.longitude;
+    let notesToPut = notes ? notes : oldTree.description;
+
+    editFruit(oldTree.id, fruitToPut, latToPut, lngToPut, notesToPut, file);
+    onEdit();
   }
 
   return (
@@ -37,11 +41,11 @@ export default function AddModal({ token, lat, lng, onClose, onAdd }) {
             ✕
           </button>
         </form>
-        <h3 className="font-bold text-lg mb-4">Add Fruit</h3>
+        <h3 className="font-bold text-lg mb-4">Edit Fruit</h3>
         {error ? (
           <div role="alert" className="alert alert-error mb-4">
             <ExclamationCircleIcon className="h-6 w-6" />
-            <span>Error! Unable to add fruit.</span>
+            <span>Error! Unable to edit fruit.</span>
           </div>
         ) : (
           <></>
@@ -49,38 +53,44 @@ export default function AddModal({ token, lat, lng, onClose, onAdd }) {
 
         <AddMap
           fruit={fruitType?.name}
-          latitude={latitude}
-          longitude={longitude}
+          latitude={latitude ? latitude: oldTree.latitude}
+          longitude={longitude? longitude: oldTree.longitude}
           token={token}
           onClick={(lt, ln) => {
             setLatitude(lt);
             setLongitude(ln);
           }}
         />
-
         <select
           disabled={loading}
           className="select select-bordered select-lg w-full mt-3"
           value={fruitType?.id}
           onChange={(e) => {
-            const fruit = fruits.find((f) => f.id == parseInt(e.target.value));
+            const fruit = fruits.find((f) => f.id === parseInt(e.target.value));
             setFruitType(fruit);
           }}
         >
-          <option disabled selected>
-            What type of fruit?
-          </option>
-          {fruits.map((fruit: Fruit) => (
-            <option key={fruit.id} value={fruit.id}>
-              {fruitIcon(fruit.name)} {fruit.name}
-            </option>
-          ))}
+          {fruits.map((fruit: Fruit) => {
+              if(oldTree.fruit === fruit.name) {
+                return (
+                  <option key={fruit.id} value={fruit.id} selected>
+                    {fruitIcon(fruit.name)} {fruit.name}
+                  </option>
+                )
+              } else {
+                return (
+                  <option key={fruit.id} value={fruit.id}>
+                    {fruitIcon(fruit.name)} {fruit.name}
+                  </option>
+                )
+              }
+          })}
         </select>
         <textarea
           className="textarea textarea-bordered w-full mt-3"
           maxLength={1000}
-          placeholder="Notes (Optional)"
           onChange={(e) => setNotes(e.target.value)}
+          defaultValue={oldTree.description}
         ></textarea>
         <div className="mt-3 flex justify-center">
           <input
@@ -109,18 +119,18 @@ export default function AddModal({ token, lat, lng, onClose, onAdd }) {
             ) : (
               <CameraIcon className="w-8 h-8" />
             )}
-            {file ? "Change Photo" : "Add Photo"}
+            {file ? "Change Photo" : "Update Photo"}
           </button>
         </div>
         <div className="modal-action">
           <button
             className="btn btn-primary"
-            disabled={!fruitType || saving}
+            disabled={saving}
             onClick={() => {
               saveFruit();
             }}
           >
-            {saving ? "Saving..." : "Add"}
+            {saving ? "Saving..." : "Edit"}
           </button>
           <button className="btn btn-outline" onClick={() => onClose()}>
             Cancel

@@ -12,21 +12,30 @@ function useSpecificFruit(): SpecificFruit {
 
   useEffect(() => {
     const fetchData = async () => {
+      if(!id) {
+        setFruit(null);
+        return;
+      }
       const response = await fetch(
         `/api/fruit_locations?id=${id}`
       );
       const data = await response.json();
-      console.log(data);
       // Re-map api data to FruitLocationDetail object
+      if(!data || data.error) {
+        setFruit(null);
+        return;
+      }
       const fruitData = data.map((item: any) => {
         const fruitLocationDetail: FruitLocationDetail = {
           id: item.id,
           fruit: item.fruit_name,
+          fruit_id: item.fruit_id,
           name: item.fruit_tree_name,
           description: item.description,
           latitude: item.latitude,
           longitude: item.longitude,
-          img_link: item.s3_img_link
+          img_link: item.s3_img_link,
+          user_id: item.user_id,
         };
         return fruitLocationDetail;
       });
