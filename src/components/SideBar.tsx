@@ -7,6 +7,8 @@ import Image from "next/image";
 import defaultFruitImg from "../../public/img/default_fruit.png";
 import Modal from "../components/ReviewModal";
 import { FruitLocationReview } from "@/types";
+import { PencilSquareIcon, TrashIcon } from "@heroicons/react/16/solid";
+import { useSession } from "next-auth/react";
 
 const SideBar = ({
   openPanel,
@@ -18,10 +20,12 @@ const SideBar = ({
   refreshReviewData,
   reviewModal,
   selectedLocation,
+  setEditModalOpen,
+  setDeleteModalOpen,
 }) => {
   const [panelSection, setPanelSection] = useState(0);
+  const { data } = useSession();
   // const [selectedReviews, avgRating, reviewCount, setSelectedReviews] = useLocationReviews();
-
   return (
     <SlidingPanel
       type={"left"}
@@ -34,7 +38,6 @@ const SideBar = ({
     >
       {/* TODO:
        * Remove panel close button, or stick it to bottom of panel (with relative positioning?)
-       * Edit button - probably far easier if this takes user to a route w/ a form. Only visible if user created this location
        */}
       <div className="panel-container grid grid-cols-1 gap-4 content-evenly text-center">
         {selectedFruit && selectedFruit.img_link ? (
@@ -81,9 +84,32 @@ const SideBar = ({
         <div className="text-start px-4">
           {panelSection === 0 ? (
             <div>
-              <p className="whitespace-pre-wrap">
+              <p className="whitespace-pre-wrap mb-4">
                 {selectedFruit?.description}
               </p>
+              {data?.user?.id && data?.user?.id === selectedFruit?.user_id ?
+              <div>
+                <div><span className="font-semibold text-xs">(You submitted this fruit tree)</span></div>
+                <div>
+                    <button className="btn btn-sm mb-2" onClick={() => {
+                        setEditModalOpen(true);
+                        setDeleteModalOpen(false);
+                    }}>
+                        <PencilSquareIcon className="h-6 w-6" />{" "}
+                        <span className="hidden md:inline">Edit</span>
+                    </button>
+                </div>
+                <div>
+                    <button className="btn btn-sm" onClick={() => {
+                        setDeleteModalOpen(true);
+                        setEditModalOpen(false);
+                    }}>
+                        <TrashIcon className="h-6 w-6" />{" "}
+                        <span className="hidden md:inline">Delete</span>
+                    </button>
+                </div>
+              </div>
+              : <></>}
             </div>
           ) : (
             <div>
