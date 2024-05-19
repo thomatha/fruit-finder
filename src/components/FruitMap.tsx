@@ -143,6 +143,7 @@ export default function FruitMap({ token }) {
           }
           onDragEnd={updateBounds}
           onLoad={updateBounds}
+          onZoomStart={() => setFollowMe(false)}
           onZoomEnd={updateBounds}
           onDragStart={() => {
             setOpenPanel(false);
@@ -186,18 +187,20 @@ export default function FruitMap({ token }) {
 
       <div className="navbar bg-white fixed bottom-0 z-10">
         <div className="navbar-start">
-          <button
-            className="btn btn-sm"
-            onClick={() => {
-              mapRef.current?.flyTo({
-                center: [state.longitude, state.latitude],
-              });
-              setFollowMe(true);
-            }}
-          >
-            <MapPinIcon className="h-6 w-6" />
-            <span className="hidden md:inline">Reset</span>
-          </button>
+          {!followMe && (
+            <button
+              className="btn btn-sm"
+              onClick={() => {
+                mapRef.current?.flyTo({
+                  center: [state.longitude, state.latitude],
+                });
+                setFollowMe(true);
+              }}
+            >
+              <MapPinIcon className="h-6 w-6" />
+              <span className="hidden md:inline">Reset</span>
+            </button>
+          )}
         </div>
         <div className="navbar-center">
           {status === "authenticated" ? (
