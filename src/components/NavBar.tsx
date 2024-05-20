@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import UserBadge from "@/components/UserBadge";
@@ -19,7 +20,8 @@ const NavBar = () => {
       <div className="navbar bg-base-100">
       <div className="flex-1">
         <a href="/" className="btn btn-ghost text-xl">
-          Fruit Finder
+          <img src="/img/512.png" width={32} height={32} alt="logo" /> 
+          <span className="hidden md:inline">Fruit Finder</span>
         </a>
       </div>
       <div className="flex-none">

@@ -1,0 +1,7 @@
+{
+  "name": "Fruit Finder",
+  "short_name": "FruitFinder",
+  "start_url": "/fruits",
+  "display": "standalone",
+  "icons": [{ "src": "img/512.png", "sizes": "512x512", "type": "image/png" }]
+}
