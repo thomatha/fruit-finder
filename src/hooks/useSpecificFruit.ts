@@ -8,7 +8,7 @@ type SpecificFruit = [
 
 function useSpecificFruit(props): SpecificFruit {
   const [fruit, setFruit] = useState<FruitLocationDetail>();
-  const [id, setId] = useState<number>(props);
+  const [id, setId] = useState<number>(props? props : 1);
 
   useEffect(() => {
     const fetchData = async () => {

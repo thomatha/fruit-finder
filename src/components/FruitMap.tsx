@@ -23,16 +23,17 @@ import SearchBar from "./SearchBar";
 import FruitFilter from "./FruitFilter";
 
 export default function FruitMap({ token, reviewRequest }) {
+  const initialState = isNaN(Number(reviewRequest.data)) ? false : true;
   const mapRef = useRef<MapRef>();
   const state = useGeolocation();
   const [modalOpen, setModalOpen] = useState(false);
   const { status } = useSession();
   const [fruits, setBounds, setFruitFilter] = useNearbyFruits();
   const [isStreet, setIsStreet] = useState(true);
-  const [selectedFruit, setSelectedFruit] = useSpecificFruit(reviewRequest ? Number(reviewRequest.data) : 1);
+  const [selectedFruit, setSelectedFruit] = useSpecificFruit(initialState ? Number(reviewRequest.data) : 1);
   const [selectedReviews, avgRating, reviewCount, setSelectedReviews] =
-    useLocationReviews(reviewRequest ? Number(reviewRequest.data) : 1);
-  const [openPanel, setOpenPanel] = useState(reviewRequest? true : false);
+    useLocationReviews(initialState ? Number(reviewRequest.data) : 1);
+  const [openPanel, setOpenPanel] = useState(initialState? true : false);
   const [selectedLocation, setSelectedLocation] = useState(0);
   const [forceRefresh, setForceRefresh] = useState(false);
 
