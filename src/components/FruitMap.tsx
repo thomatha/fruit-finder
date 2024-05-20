@@ -22,17 +22,18 @@ import { toast } from "react-toastify";
 import SearchBar from "./SearchBar";
 import FruitFilter from "./FruitFilter";
 
-export default function FruitMap({ token }) {
+export default function FruitMap({ token, reviewRequest }) {
+  console.log(reviewRequest.data);
   const mapRef = useRef<MapRef>();
   const state = useGeolocation();
   const [modalOpen, setModalOpen] = useState(false);
   const { status } = useSession();
   const [fruits, setBounds, setFruitFilter] = useNearbyFruits();
   const [isStreet, setIsStreet] = useState(true);
-  const [selectedFruit, setSelectedFruit] = useSpecificFruit();
+  const [selectedFruit, setSelectedFruit] = useSpecificFruit(reviewRequest ? Number(reviewRequest.data) : 1);
   const [selectedReviews, avgRating, reviewCount, setSelectedReviews] =
-    useLocationReviews();
-  const [openPanel, setOpenPanel] = useState(false);
+    useLocationReviews(reviewRequest ? Number(reviewRequest.data) : 1);
+  const [openPanel, setOpenPanel] = useState(reviewRequest? true : false);
   const [selectedLocation, setSelectedLocation] = useState(0);
   const [forceRefresh, setForceRefresh] = useState(false);
 
