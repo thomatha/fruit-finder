@@ -23,7 +23,6 @@ import SearchBar from "./SearchBar";
 import FruitFilter from "./FruitFilter";
 
 export default function FruitMap({ token, reviewRequest }) {
-  console.log(reviewRequest.data);
   const mapRef = useRef<MapRef>();
   const state = useGeolocation();
   const [modalOpen, setModalOpen] = useState(false);
