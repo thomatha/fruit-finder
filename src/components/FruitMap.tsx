@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useGeolocation } from "@uidotdev/usehooks";
 import Map, { Marker, type MapRef } from "react-map-gl";
@@ -26,7 +26,7 @@ import FruitFilter from "./FruitFilter";
 
 export default function FruitMap({ token }) {
   const mapRef = useRef<MapRef>();
-  const state = useGeolocation();
+  const state = useGeolocation({ enableHighAccuracy: true });
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -39,6 +39,13 @@ export default function FruitMap({ token }) {
   const [openPanel, setOpenPanel] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(0);
   const [forceRefresh, setForceRefresh] = useState(false);
+  const [followMe, setFollowMe] = useState(true);
+
+  useEffect(() => {
+    if (followMe) {
+      mapRef.current?.setCenter([state.longitude, state.latitude]);
+    }
+  }, [state]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (state.loading) {
     // TODO show spinner or loading indicator
@@ -136,9 +143,11 @@ export default function FruitMap({ token }) {
           }
           onDragEnd={updateBounds}
           onLoad={updateBounds}
+          onZoomStart={() => setFollowMe(false)}
           onZoomEnd={updateBounds}
           onDragStart={() => {
             setOpenPanel(false);
+            setFollowMe(false);
             setSelectedFruit(null);
           }}
         >
@@ -178,17 +187,20 @@ export default function FruitMap({ token }) {
 
       <div className="navbar bg-white fixed bottom-0 z-10">
         <div className="navbar-start">
-          <button
-            className="btn btn-sm"
-            onClick={() => {
-              mapRef.current?.flyTo({
-                center: [state.longitude, state.latitude],
-              });
-            }}
-          >
-            <MapPinIcon className="h-6 w-6" />
-            <span className="hidden md:inline">Reset</span>
-          </button>
+          {!followMe && (
+            <button
+              className="btn btn-sm"
+              onClick={() => {
+                mapRef.current?.flyTo({
+                  center: [state.longitude, state.latitude],
+                });
+                setFollowMe(true);
+              }}
+            >
+              <MapPinIcon className="h-6 w-6" />
+              <span className="hidden md:inline">Reset</span>
+            </button>
+          )}
         </div>
         <div className="navbar-center">
           {status === "authenticated" ? (
