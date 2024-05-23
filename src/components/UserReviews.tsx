@@ -11,7 +11,6 @@ function UserReviews() {
   const userID = data?.user?.id;
 
   const res = useUserReviews(userID);
-  console.log(res); 
 
   return (
     <div>
@@ -31,7 +30,8 @@ function UserReviews() {
             </div>
             <Link href={{ pathname: '/fruits', query: {data: JSON.stringify(review.tree_id) } }} 
                   className='btn btn-sm btn-outline btn-primary inline-flex items-center'>
-                  See Tree</Link>
+                  See Tree
+            </Link>
             <br/>
             <div>
               <p className='card-body'>{review.created}<br/>{review.review_text}</p>
