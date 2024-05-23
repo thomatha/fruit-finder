@@ -4,6 +4,7 @@ import React from 'react'
 import { useUserTrees } from '@/hooks/useUserTrees';
 import Link from 'next/link';
 import Image from "next/image";
+import defaultFruitImg from "../../public/img/default_fruit.png";
 
 function UserTrees() {
 
@@ -21,18 +22,30 @@ function UserTrees() {
           <>
           <div className='card-bordered w-96 bg-base-100 shadow-xl' key={tree.id}>
             <div className="tree-img">
-              <Image
-                src={tree.s3_img_link}
-                alt="fruit_tree_image"
-                height={250}
-                width={450}
-              ></Image>
+              {
+                tree.s3_img_link
+                ?
+                  <Image
+                    src={tree.s3_img_link}
+                    alt="fruit_tree_image"
+                    height={250}
+                    width={450}
+                  ></Image>
+                :
+                  <Image
+                    src={defaultFruitImg}
+                    alt="default_fruit_tree_image"
+                    height={250}
+                    width={450}
+                  ></Image>
+              }
             </div>
             <br/>
             <div>
               <p className='card-body'>
                 <span className='font-semibold text-lg'>{tree.name}</span><br/>
-                {tree.description}<br/>
+                {tree.description}
+                {tree.description ? <br/> : null}
 
                 Added {tree.created}
               </p>
