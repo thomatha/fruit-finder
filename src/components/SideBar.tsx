@@ -9,7 +9,7 @@ import Modal from "../components/ReviewModal";
 import { FruitLocationReview } from "@/types";
 import { PencilSquareIcon, TrashIcon } from "@heroicons/react/16/solid";
 import { useSession } from "next-auth/react";
-import useWindowDimensions from "../hooks/useWindowDimensions";
+import useWindowWidth from "../hooks/useWindowWidth";
 
 const SideBar = ({
   openPanel,
@@ -26,7 +26,7 @@ const SideBar = ({
 }) => {
   const [panelSection, setPanelSection] = useState(0);
   const { data } = useSession();
-  const { width } = useWindowDimensions();
+  const { width } = useWindowWidth();
   // const [selectedReviews, avgRating, reviewCount, setSelectedReviews] = useLocationReviews();
   return (
     <SlidingPanel
