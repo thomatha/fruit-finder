@@ -74,9 +74,15 @@ export async function GET(request: Request) {
                     ftr.rating, 
                     ftr.review_text,
                     ftr.created,
-                    ftr.updated
+                    ftr.updated,
+                    ftl.latitude,
+                    ftl.longitude
                 FROM 
                     fruit_tree_reviews ftr
+                JOIN
+                    fruit_tree_locations ftl
+                ON
+                    ftl.id = ftr.tree_id
                 WHERE
                     ftr.user_id = ${user_id}
                 ORDER BY ftr.created DESC;
@@ -101,7 +107,7 @@ export async function POST(request: Request) {
     const session = await getServerSession(authOptions);
 
     // Check that session exists, and that the frontend session matches server session
-    if(!session || !session.user || data.user_id !== session.user.id) {
+    if(!session || !session.user || data.userId !== session.user.id) {
         return NextResponse.json({error: 'You are not authorized to POST to this resource'}, {status: 401});
     }
 

@@ -24,8 +24,8 @@ import { toast } from "react-toastify";
 import SearchBar from "./SearchBar";
 import FruitFilter from "./FruitFilter";
 
-export default function FruitMap({ token, reviewRequest }) {
-  const initialState = isNaN(Number(reviewRequest.data)) ? false : true;
+export default function FruitMap({ token, requestParams }) {
+  const initialState = isNaN(Number(requestParams.data)) ? false : true;
   const mapRef = useRef<MapRef>();
   const state = useGeolocation({ enableHighAccuracy: true });
   const [addModalOpen, setAddModalOpen] = useState(false);
@@ -34,13 +34,15 @@ export default function FruitMap({ token, reviewRequest }) {
   const { status } = useSession();
   const [fruits, setBounds, setFruitFilter] = useNearbyFruits();
   const [isStreet, setIsStreet] = useState(true);
-  const [selectedFruit, setSelectedFruit] = useSpecificFruit(initialState ? Number(reviewRequest.data) : 1);
+  const [selectedFruit, setSelectedFruit] = useSpecificFruit(initialState ? Number(requestParams.data) : 1);
   const [selectedReviews, avgRating, reviewCount, setSelectedReviews] =
-    useLocationReviews(initialState ? Number(reviewRequest.data) : 1);
+    useLocationReviews(initialState ? Number(requestParams.data) : 1);
   const [openPanel, setOpenPanel] = useState(initialState? true : false);
   const [selectedLocation, setSelectedLocation] = useState(0);
   const [forceRefresh, setForceRefresh] = useState(false);
-  const [followMe, setFollowMe] = useState(true);
+  const [followMe, setFollowMe] = useState(!(requestParams.lat && requestParams.lng));
+  const initialLat = requestParams.lat ? requestParams.lat : null;
+  const initialLng = requestParams.lng ? requestParams.lng : null;
 
   useEffect(() => {
     if (followMe) {
@@ -131,8 +133,8 @@ export default function FruitMap({ token, reviewRequest }) {
           ref={mapRef}
           mapboxAccessToken={token}
           initialViewState={{
-            longitude: state.longitude,
-            latitude: state.latitude,
+            longitude: initialLng ? initialLng : state.longitude,
+            latitude: initialLat ? initialLat : state.latitude,
             zoom: 16,
           }}
           // TODO - make height fill view port:

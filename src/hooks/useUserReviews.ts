@@ -8,10 +8,8 @@ export function useUserReviews (id: string) {
 
     if(data){
         data.map(review => {
-            var utc = new Date(review.created);
-            var offset = utc.getTimezoneOffset();
-            var local = new Date(utc.getTime() - offset * 60000);
-            review.created = local.toLocaleString();
+            const formattedDate = new Date(review.created);
+            review.created = formattedDate.toLocaleString();
     })}
 
     return {

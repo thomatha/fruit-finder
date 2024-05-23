@@ -9,6 +9,7 @@ import Modal from "../components/ReviewModal";
 import { FruitLocationReview } from "@/types";
 import { PencilSquareIcon, TrashIcon } from "@heroicons/react/16/solid";
 import { useSession } from "next-auth/react";
+import useWindowWidth from "../hooks/useWindowWidth";
 
 const SideBar = ({
   openPanel,
@@ -25,13 +26,31 @@ const SideBar = ({
 }) => {
   const [panelSection, setPanelSection] = useState(0);
   const { data } = useSession();
+  const { width } = useWindowWidth();
   // const [selectedReviews, avgRating, reviewCount, setSelectedReviews] = useLocationReviews();
   return (
     <SlidingPanel
       type={"left"}
       isOpen={openPanel}
       backdropClicked={() => setOpenPanel(false)}
-      size={22}
+      size={
+        width > 1225 ?
+          22
+        : 
+        width > 1000 ?
+          28
+        :
+        width > 850 ?
+          34
+        :
+        width > 750 ?
+          40
+        :
+        width > 600 ?
+          46
+        :
+          75
+      }
       panelClassName=""
       panelContainerClassName="my-20 bg-base-100"
       noBackdrop={true}
