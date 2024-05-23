@@ -23,14 +23,20 @@ const SideBar = ({
   setEditModalOpen,
   setDeleteModalOpen,
 }) => {
+  /* Panel sections:
+    0: Overview
+    1: Reviews
+  */
   const [panelSection, setPanelSection] = useState(0);
   const { data } = useSession();
-  // const [selectedReviews, avgRating, reviewCount, setSelectedReviews] = useLocationReviews();
+
   return (
     <SlidingPanel
       type={"left"}
       isOpen={openPanel}
       backdropClicked={() => setOpenPanel(false)}
+      // Adjust size of sidebar based on benchmarks.
+      // This is eyeballed. We want the sidebar to be readable no matter the screen size.
       size={
         window.innerWidth > 1225 ?
           22

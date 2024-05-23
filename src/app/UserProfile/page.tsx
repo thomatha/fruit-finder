@@ -19,7 +19,7 @@ const Profile = () => {
     setBio(newBio);
 
     // need to add code to save in the DB here
-
+    // Bio would make sense as the new tab 0
   };
 
   const { data } = useSession();
