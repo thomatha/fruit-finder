@@ -23,8 +23,8 @@ import { authOptions } from "../auth/authOptions";
  * @property  {float} north the northern side of the box
  * @property  {float} south the southern side of the box
  * 
- * Option 4 - Get all fruit tree locations
- * @property  {int} all If this parameter exists, fetch all fruit tree locations
+ * Option 4 - Get all fruit tree locations contributed by a specific user
+ * @property  {int} user_id the user_id of the user for which to fetch fruit trees
  * 
  * @return {FruitTreeLocation[]} the list of fruit tree location records 
  */
@@ -35,7 +35,7 @@ export async function GET(request: Request) {
     const longitude = searchParams.get('longitude');
     const radius = searchParams.get('radius');
     const fruitId = searchParams.get('fruit_id');
-    const all = searchParams.get('all');
+    const userId = searchParams.get('user_id');
 
     const east = searchParams.get('east');
     const west = searchParams.get('west');
@@ -193,17 +193,20 @@ export async function GET(request: Request) {
                 return NextResponse.json({ error: 'An error occurred when fetching fruit tree locations' }, { status: 500 });
             }
         }
-    } else if(all) {
-        // Fetch all fruit tree locations wherever they may be (This is likely only going to be used for debug purposes)
+    } else if(userId) {
+        // Fetch all fruit tree locations contributed by a specific user
         if(fruitId) {
             try {
                 fruitTreeLocations = await sql`
                     SELECT 
                         ftl.id,
-                        ftl.name AS fruit_tree_name, 
+                        ftl.name, 
+                        ftl.description,
                         ftl.latitude, 
                         ftl.longitude, 
                         ftl.user_id,
+                        ftl.created,
+                        ftl.s3_img_link,
                         f.name AS fruit_name, 
                         f.id AS fruit_id,
                         f.color 
@@ -211,7 +214,8 @@ export async function GET(request: Request) {
                         fruit_tree_locations ftl
                     LEFT JOIN 
                         fruits f ON ftl.fruit_id = f.id
-                    WHERE f.id = ${fruitId};
+                    WHERE f.id = ${fruitId}
+                    AND ftl.user_id = ${userId};
                 `;
             } catch(e) {
                 return NextResponse.json({ error: 'An error occurred when fetching fruit tree locations' }, { status: 500 });
@@ -221,17 +225,21 @@ export async function GET(request: Request) {
                 fruitTreeLocations = await sql`
                     SELECT 
                         ftl.id,
-                        ftl.name AS fruit_tree_name, 
+                        ftl.name, 
+                        ftl.description,
                         ftl.latitude, 
                         ftl.longitude, 
                         ftl.user_id,
+                        ftl.created,
+                        ftl.s3_img_link,
                         f.name AS fruit_name, 
                         f.id AS fruit_id,
                         f.color 
                     FROM 
                         fruit_tree_locations ftl
                     LEFT JOIN 
-                        fruits f ON ftl.fruit_id = f.id;
+                        fruits f ON ftl.fruit_id = f.id
+                    WHERE ftl.user_id = ${userId};
                 `;
             } catch(e) {
                 return NextResponse.json({ error: 'An error occurred when fetching fruit tree locations' }, { status: 500 });

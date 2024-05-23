@@ -101,7 +101,7 @@ export async function POST(request: Request) {
     const session = await getServerSession(authOptions);
 
     // Check that session exists, and that the frontend session matches server session
-    if(!session || !session.user || data.user_id !== session.user.id) {
+    if(!session || !session.user || data.userId !== session.user.id) {
         return NextResponse.json({error: 'You are not authorized to POST to this resource'}, {status: 401});
     }
 

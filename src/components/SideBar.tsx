@@ -31,7 +31,24 @@ const SideBar = ({
       type={"left"}
       isOpen={openPanel}
       backdropClicked={() => setOpenPanel(false)}
-      size={22}
+      size={
+        window.innerWidth > 1225 ?
+          22
+        : 
+        window.innerWidth > 1000 ?
+          28
+        :
+        window.innerWidth > 850 ?
+          34
+        :
+        window.innerWidth > 750 ?
+          40
+        :
+        window.innerWidth > 600 ?
+          46
+        :
+          75
+      }
       panelClassName=""
       panelContainerClassName="my-20 bg-base-100"
       noBackdrop={true}
