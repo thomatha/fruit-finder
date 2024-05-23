@@ -12,5 +12,5 @@ export default function Fruits({
   searchParams: { [key: string]: string | string[] | undefined }
 }) {
   
-  return <FruitMap token={TOKEN} reviewRequest={searchParams} />;
+  return <FruitMap token={TOKEN} requestParams={searchParams} />;
 }

@@ -28,7 +28,11 @@ function UserReviews() {
               <input type="radio" id="rating-4" className="mask mask-star" checked={review.rating == 4} readOnly />
               <input type="radio" id="rating-5" className="mask mask-star" checked={review.rating == 5} readOnly />
             </div>
-            <Link href={{ pathname: '/fruits', query: {data: JSON.stringify(review.tree_id) } }} 
+            <Link href={{ pathname: '/fruits', query: {
+              data: JSON.stringify(review.tree_id),
+              lat: JSON.stringify(review.latitude),
+              lng: JSON.stringify(review.longitude),
+            }}} 
                   className='btn btn-sm btn-outline btn-primary inline-flex items-center'>
                   See Tree
             </Link>

@@ -74,9 +74,15 @@ export async function GET(request: Request) {
                     ftr.rating, 
                     ftr.review_text,
                     ftr.created,
-                    ftr.updated
+                    ftr.updated,
+                    ftl.latitude,
+                    ftl.longitude
                 FROM 
                     fruit_tree_reviews ftr
+                JOIN
+                    fruit_tree_locations ftl
+                ON
+                    ftl.id = ftr.tree_id
                 WHERE
                     ftr.user_id = ${user_id}
                 ORDER BY ftr.created DESC;

@@ -38,7 +38,11 @@ function UserTrees() {
               </p>
             </div>
             <Link 
-              href={{ pathname: '/fruits', query: {data: JSON.stringify(tree.id) } }} 
+              href={{ pathname: '/fruits', query: {
+                data: JSON.stringify(tree.id),
+                lat: JSON.stringify(tree.latitude),
+                lng: JSON.stringify(tree.longitude),
+              }}} 
               className='btn btn-sm btn-outline btn-primary inline-flex items-center mb-8 ml-8'>
               See Tree
             </Link>
