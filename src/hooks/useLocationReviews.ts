@@ -9,11 +9,11 @@ type LocationReviews = [
     (id: number, refresh: boolean) => void
 ];
 
-function useLocationReviews(): LocationReviews {
+function useLocationReviews(props): LocationReviews {
     const [reviews, setReviews] = useState<FruitLocationReview[]>();
     const [rating, setRating] = useState<number>(1);
     const [count, setCount] = useState<number>(0);
-    const [id, setId] = useState<number>(1);
+    const [id, setId] = useState<number>(props);
     const [forceRefresh, setForceRefresh] = useState<boolean>(false);
 
     useEffect(() => {

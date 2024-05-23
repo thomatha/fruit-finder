@@ -3,13 +3,14 @@ import { useSession } from 'next-auth/react'
 import React from 'react'
 import { useUserReviews } from '@/hooks/useUserReviews';
 import UserBadge from './UserBadge';
+import Link from 'next/link';
 
 function UserReviews() {
 
   const {data} = useSession();
   const userID = data?.user?.id;
 
-  const res = useUserReviews(userID); 
+  const res = useUserReviews(userID);
 
   return (
     <div>
@@ -27,6 +28,10 @@ function UserReviews() {
               <input type="radio" id="rating-4" className="mask mask-star" checked={review.rating == 4} readOnly />
               <input type="radio" id="rating-5" className="mask mask-star" checked={review.rating == 5} readOnly />
             </div>
+            <Link href={{ pathname: '/fruits', query: {data: JSON.stringify(review.tree_id) } }} 
+                  className='btn btn-sm btn-outline btn-primary inline-flex items-center'>
+                  See Tree
+            </Link>
             <br/>
             <div>
               <p className='card-body'>{review.created}<br/>{review.review_text}</p>

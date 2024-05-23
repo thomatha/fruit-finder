@@ -17,7 +17,7 @@ const NavBar = () => {
     const user = session.user;
 
     return (
-      <div className="navbar bg-base-100">
+      <div className="navbar bg-base-100 sticky top-0 z-50">
       <div className="flex-1">
         <a href="/" className="btn btn-ghost text-xl">
           <img src="/img/512.png" width={32} height={32} alt="logo" /> 
@@ -34,7 +34,7 @@ const NavBar = () => {
               <ul className="p-2 bg-base-100 rounded-t-none min-w-40 end-0">
                 <li>
                 {user ? (
-                    <Link href="/">Sign Out</Link>
+                    <Link href="/api/auth/signout">Sign Out</Link>
                   ) : (
                     <Link href="/">Sign In</Link>
                   )}
@@ -65,7 +65,8 @@ const NavBar = () => {
         </a>
       </div>
       <div className="flex-none">
-        <span className="loading loading-spinner loading-xs"></span>  
+        {/*CHANGE THIS TO BE SIGN IN IF USER ISN'T AUTHENTICATED!*/}
+        <Link href="/api/auth/signin">Sign In</Link>  
       </div>
     </div>
     )
