@@ -24,7 +24,8 @@ import { toast } from "react-toastify";
 import SearchBar from "./SearchBar";
 import FruitFilter from "./FruitFilter";
 
-export default function FruitMap({ token }) {
+export default function FruitMap({ token, reviewRequest }) {
+  const initialState = isNaN(Number(reviewRequest.data)) ? false : true;
   const mapRef = useRef<MapRef>();
   const state = useGeolocation({ enableHighAccuracy: true });
   const [addModalOpen, setAddModalOpen] = useState(false);
@@ -33,10 +34,10 @@ export default function FruitMap({ token }) {
   const { status } = useSession();
   const [fruits, setBounds, setFruitFilter] = useNearbyFruits();
   const [isStreet, setIsStreet] = useState(true);
-  const [selectedFruit, setSelectedFruit] = useSpecificFruit();
+  const [selectedFruit, setSelectedFruit] = useSpecificFruit(initialState ? Number(reviewRequest.data) : 1);
   const [selectedReviews, avgRating, reviewCount, setSelectedReviews] =
-    useLocationReviews();
-  const [openPanel, setOpenPanel] = useState(false);
+    useLocationReviews(initialState ? Number(reviewRequest.data) : 1);
+  const [openPanel, setOpenPanel] = useState(initialState? true : false);
   const [selectedLocation, setSelectedLocation] = useState(0);
   const [forceRefresh, setForceRefresh] = useState(false);
   const [followMe, setFollowMe] = useState(true);
