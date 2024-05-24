@@ -4,7 +4,7 @@ import { Fragment, useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useGeolocation } from "@uidotdev/usehooks";
 import Map, { Marker, type MapRef } from "react-map-gl";
-import { PlusCircleIcon } from "@heroicons/react/16/solid";
+import { PlusCircleIcon, ExclamationTriangleIcon } from "@heroicons/react/16/solid";
 import {
   GlobeEuropeAfricaIcon,
   MapIcon,
@@ -22,7 +22,7 @@ import DeleteModal from "./DeleteModal";
 import SideBar from "./SideBar";
 import SearchBar from "./SearchBar";
 import FruitFilter from "./FruitFilter";
-import ToasterAlert from '@/components/ToasterAlert';
+import ToasterAlert from "@/components/ToasterAlert";
 import { toast } from "react-hot-toast";
 
 export default function FruitMap({ token, requestParams }) {
@@ -35,13 +35,17 @@ export default function FruitMap({ token, requestParams }) {
   const { status } = useSession();
   const [fruits, setBounds, setFruitFilter] = useNearbyFruits();
   const [isStreet, setIsStreet] = useState(true);
-  const [selectedFruit, setSelectedFruit] = useSpecificFruit(initialState ? Number(requestParams.data) : 1);
+  const [selectedFruit, setSelectedFruit] = useSpecificFruit(
+    initialState ? Number(requestParams.data) : 1
+  );
   const [selectedReviews, avgRating, reviewCount, setSelectedReviews] =
     useLocationReviews(initialState ? Number(requestParams.data) : 1);
-  const [openPanel, setOpenPanel] = useState(initialState? true : false);
+  const [openPanel, setOpenPanel] = useState(initialState ? true : false);
   const [selectedLocation, setSelectedLocation] = useState(0);
   const [forceRefresh, setForceRefresh] = useState(false);
-  const [followMe, setFollowMe] = useState(!(requestParams.lat && requestParams.lng));
+  const [followMe, setFollowMe] = useState(
+    !(requestParams.lat && requestParams.lng)
+  );
   const initialLat = requestParams.lat ? requestParams.lat : null;
   const initialLng = requestParams.lng ? requestParams.lng : null;
 
@@ -52,12 +56,20 @@ export default function FruitMap({ token, requestParams }) {
   }, [state]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (state.loading) {
-    // TODO show spinner or loading indicator
-    return <p>Loading... (you may need to enable permissions)</p>;
+    return (
+      <div className="w-100 h-screen flex items-center justify-center text-2xl text-gray-500">
+        <span className="loading loading-spinner loading-lg mr-2"></span>
+      </div>
+    );
   }
 
   if (state.error) {
-    return <p>Enable permissions to access your location data</p>;
+    return (
+      <div className="w-100 h-screen flex items-center justify-center text-2xl text-red-500">
+        <ExclamationTriangleIcon className="h-6 w-6 mr-2" />
+        Enable permissions to access your location data
+      </div>
+    );
   }
 
   const updateBounds = () => {
