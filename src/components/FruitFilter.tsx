@@ -14,7 +14,7 @@ export default function FruitFilter({ handleFilter }) {
     const [selected, setSelected] = useState({ id: -1, name: 'Fruit Filter' })
 
     return (
-        <div className="m-2 mapboxgl-ctrl max-w-40">
+        <div className="mx-2 mapboxgl-ctrl w-48">
             <Listbox value={selected} onChange={(value) => {
                 setSelected(value);
                 handleFilter(value);

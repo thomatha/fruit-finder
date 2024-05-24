@@ -22,9 +22,9 @@
     "pg": "^8.11.5",
     "react": "^18",
     "react-dom": "^18",
+    "react-hot-toast": "^2.4.1",
     "react-map-gl": "^7.1.7",
     "react-sliding-side-panel": "^2.0.3",
-    "react-toastify": "^10.0.5",
     "swr": "^2.2.5"
   },
   "devDependencies": {

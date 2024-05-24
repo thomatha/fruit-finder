@@ -5,7 +5,7 @@ import { useState } from "react";
 import SlidingPanel from "react-sliding-side-panel";
 import Image from "next/image";
 import defaultFruitImg from "../../public/img/default_fruit.png";
-import Modal from "../components/ReviewModal";
+import ReviewModal from "../components/ReviewModal";
 import { FruitLocationReview } from "@/types";
 import { PencilSquareIcon, TrashIcon } from "@heroicons/react/16/solid";
 import { useSession } from "next-auth/react";
@@ -19,7 +19,6 @@ const SideBar = ({
   avgRating,
   reviewCount,
   refreshReviewData,
-  reviewModal,
   selectedLocation,
   setEditModalOpen,
   setDeleteModalOpen,
@@ -28,6 +27,7 @@ const SideBar = ({
   const { data } = useSession();
   const { width } = useWindowWidth();
   // const [selectedReviews, avgRating, reviewCount, setSelectedReviews] = useLocationReviews();
+
   return (
     <SlidingPanel
       type={"left"}
@@ -218,17 +218,11 @@ const SideBar = ({
                 </div>
               </div>
               <div className="flex justify-center">
-                <Modal
+                <ReviewModal
                   treeId={selectedLocation}
                   treeDesc={selectedFruit ? selectedFruit.name : ""}
                   onReviewSubmit={refreshReviewData}
                 />
-                <button
-                  className="btn btn-outline"
-                  onClick={() => reviewModal()}
-                >
-                  Write a Review
-                </button>
               </div>
               <div id="reviewList">
                 {selectedReviews.map((locationReview: FruitLocationReview) => (
