@@ -69,8 +69,6 @@ export default function useAddFruit(): AddFruitData {
           console.error("Failed to get pre-signed URL.");
         }
       }
-    } catch(e) {
-      s3_img_link = null;
     } finally {
 
       // TODO const s3_img_link = await uploadImage(file);
