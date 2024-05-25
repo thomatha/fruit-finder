@@ -37,8 +37,6 @@ const SideBar = ({
       type={"left"}
       isOpen={openPanel}
       backdropClicked={() => setOpenPanel(false)}
-      // Adjust size of sidebar based on benchmarks.
-      // This is eyeballed. We want the sidebar to be readable no matter the screen size.
       size={
         width > 1225 ?
           22
