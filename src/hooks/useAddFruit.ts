@@ -71,34 +71,35 @@ export default function useAddFruit(): AddFruitData {
       }
     } catch(e) {
       s3_img_link = null;
+    } finally {
+
+      // TODO const s3_img_link = await uploadImage(file);
+
+      const data = {
+        name: fruit.name,
+        fruit_id: fruit.id,
+        latitude,
+        longitude,
+        description: notes,
+        s3_img_link,
+        user_id,
+      };
+      try {
+        const response = await fetch("/api/fruit_locations", {
+          method: "POST", // Specify the HTTP method as POST
+          headers: {
+            "Content-Type": "application/json", // Set the Content-Type header to indicate JSON data
+          },
+          body: JSON.stringify(data), // Stringify the JavaScript object into JSON format
+        });
+
+        if (!response.ok) throw new Error(response.statusText);
+      } catch (e) {
+        console.error(e);
+        setError(true);
+      }
+      setSaving(false);
     }
-
-    // TODO const s3_img_link = await uploadImage(file);
-
-    const data = {
-      name: fruit.name,
-      fruit_id: fruit.id,
-      latitude,
-      longitude,
-      description: notes,
-      s3_img_link,
-      user_id,
-    };
-    try {
-      const response = await fetch("/api/fruit_locations", {
-        method: "POST", // Specify the HTTP method as POST
-        headers: {
-          "Content-Type": "application/json", // Set the Content-Type header to indicate JSON data
-        },
-        body: JSON.stringify(data), // Stringify the JavaScript object into JSON format
-      });
-
-      if (!response.ok) throw new Error(response.statusText);
-    } catch (e) {
-      console.error(e);
-      setError(true);
-    }
-    setSaving(false);
   }
 
   return [addFruit, saving, error];
