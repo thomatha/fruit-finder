@@ -20,9 +20,10 @@ import AddModal from "./AddModal";
 import EditModal from "./EditModal";
 import DeleteModal from "./DeleteModal";
 import SideBar from "./SideBar";
-import { toast } from "react-toastify";
 import SearchBar from "./SearchBar";
 import FruitFilter from "./FruitFilter";
+import ToasterAlert from '@/components/ToasterAlert';
+import { toast } from "react-hot-toast";
 
 export default function FruitMap({ token, requestParams }) {
   const initialState = isNaN(Number(requestParams.data)) ? false : true;
@@ -75,10 +76,6 @@ export default function FruitMap({ token, requestParams }) {
     setSelectedLocation(id);
     setOpenPanel(true);
   };
-
-  function reviewModal() {
-    (document.getElementById("review_modal") as HTMLDialogElement).showModal();
-  }
 
   const refreshReviewData = () => {
     setForceRefresh(!forceRefresh);
@@ -154,12 +151,14 @@ export default function FruitMap({ token, requestParams }) {
             setSelectedFruit(null);
           }}
         >
-          <SearchBar onSearchSubmit={retrieveSearch} />
-          <FruitFilter
-            handleFilter={(fruit: Fruit) => {
-              setFruitFilter(fruit.id === -1 ? undefined : fruit);
-            }}
-          />
+          <div className="mapboxgl-ctrl-top-right">
+            <SearchBar onSearchSubmit={retrieveSearch} />
+            <FruitFilter
+              handleFilter={(fruit: Fruit) => {
+                setFruitFilter(fruit.id === -1 ? undefined : fruit);
+              }}
+            />
+          </div>
           {fruits.map((fruitLocation: FruitLocation) => (
             <Fragment key={fruitLocation.id}>
               <Marker
@@ -246,13 +245,12 @@ export default function FruitMap({ token, requestParams }) {
         avgRating={avgRating}
         reviewCount={reviewCount}
         refreshReviewData={refreshReviewData}
-        reviewModal={reviewModal}
         selectedLocation={selectedLocation}
         setEditModalOpen={setEditModalOpen}
         setDeleteModalOpen={setDeleteModalOpen}
       />
       <div></div>
-
+      <ToasterAlert />
       {/* Conditionally render modal so state is reset each time opened */}
       {addModalOpen ? (
         <AddModal

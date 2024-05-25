@@ -5,10 +5,11 @@ import { useState } from "react";
 import SlidingPanel from "react-sliding-side-panel";
 import Image from "next/image";
 import defaultFruitImg from "../../public/img/default_fruit.png";
-import Modal from "../components/ReviewModal";
+import ReviewModal from "../components/ReviewModal";
 import { FruitLocationReview } from "@/types";
 import { PencilSquareIcon, TrashIcon } from "@heroicons/react/16/solid";
 import { useSession } from "next-auth/react";
+import useWindowWidth from "../hooks/useWindowWidth";
 
 const SideBar = ({
   openPanel,
@@ -18,7 +19,6 @@ const SideBar = ({
   avgRating,
   reviewCount,
   refreshReviewData,
-  reviewModal,
   selectedLocation,
   setEditModalOpen,
   setDeleteModalOpen,
@@ -29,6 +29,8 @@ const SideBar = ({
   */
   const [panelSection, setPanelSection] = useState(0);
   const { data } = useSession();
+  const { width } = useWindowWidth();
+  // const [selectedReviews, avgRating, reviewCount, setSelectedReviews] = useLocationReviews();
 
   return (
     <SlidingPanel
@@ -38,19 +40,19 @@ const SideBar = ({
       // Adjust size of sidebar based on benchmarks.
       // This is eyeballed. We want the sidebar to be readable no matter the screen size.
       size={
-        window.innerWidth > 1225 ?
+        width > 1225 ?
           22
         : 
-        window.innerWidth > 1000 ?
+        width > 1000 ?
           28
         :
-        window.innerWidth > 850 ?
+        width > 850 ?
           34
         :
-        window.innerWidth > 750 ?
+        width > 750 ?
           40
         :
-        window.innerWidth > 600 ?
+        width > 600 ?
           46
         :
           75
@@ -222,17 +224,11 @@ const SideBar = ({
                 </div>
               </div>
               <div className="flex justify-center">
-                <Modal
+                <ReviewModal
                   treeId={selectedLocation}
                   treeDesc={selectedFruit ? selectedFruit.name : ""}
                   onReviewSubmit={refreshReviewData}
                 />
-                <button
-                  className="btn btn-outline"
-                  onClick={() => reviewModal()}
-                >
-                  Write a Review
-                </button>
               </div>
               <div id="reviewList">
                 {selectedReviews.map((locationReview: FruitLocationReview) => (
