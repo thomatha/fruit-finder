@@ -119,6 +119,9 @@ const SideBar = ({
                     <button className="btn btn-sm mb-2" onClick={() => {
                         setEditModalOpen(true);
                         setDeleteModalOpen(false);
+                        if(width < 1225) {
+                          setOpenPanel(false);
+                        }
                     }}>
                         <PencilSquareIcon className="h-6 w-6" />{" "}
                         <span className="hidden md:inline">Edit</span>
@@ -128,6 +131,9 @@ const SideBar = ({
                     <button className="btn btn-sm" onClick={() => {
                         setDeleteModalOpen(true);
                         setEditModalOpen(false);
+                        if(width < 1225) {
+                          setOpenPanel(false);
+                        }
                     }}>
                         <TrashIcon className="h-6 w-6" />{" "}
                         <span className="hidden md:inline">Delete</span>

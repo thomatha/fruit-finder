@@ -52,6 +52,10 @@ export default function useAddFruit(): AddFruitData {
 
         const uploadResponse = await fetch(url, {
           method: "POST",
+          headers: { 
+            "Cache-Control": 'no-cache',
+            "Origin": null,
+          },
           body: formData,
         });
 
