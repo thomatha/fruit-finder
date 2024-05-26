@@ -23,6 +23,10 @@ const SideBar = ({
   setEditModalOpen,
   setDeleteModalOpen,
 }) => {
+  /* Panel sections:
+    0: Overview
+    1: Reviews
+  */
   const [panelSection, setPanelSection] = useState(0);
   const { data } = useSession();
   const { width } = useWindowWidth();
@@ -113,6 +117,9 @@ const SideBar = ({
                     <button className="btn btn-sm mb-2" onClick={() => {
                         setEditModalOpen(true);
                         setDeleteModalOpen(false);
+                        if(width < 1225) {
+                          setOpenPanel(false);
+                        }
                     }}>
                         <PencilSquareIcon className="h-6 w-6" />{" "}
                         <span className="hidden md:inline">Edit</span>
@@ -122,6 +129,9 @@ const SideBar = ({
                     <button className="btn btn-sm" onClick={() => {
                         setDeleteModalOpen(true);
                         setEditModalOpen(false);
+                        if(width < 1225) {
+                          setOpenPanel(false);
+                        }
                     }}>
                         <TrashIcon className="h-6 w-6" />{" "}
                         <span className="hidden md:inline">Delete</span>
