@@ -54,8 +54,7 @@ export default function useAddFruit(): AddFruitData {
           const uploadResponse = await fetch(url, {
             method: "POST",
             headers: { 
-              "Cache-Control": 'no-cache',
-              "Origin": null,
+              "Cache-Control": 'no-cache'
             },
             body: formData,
           });
@@ -69,6 +68,8 @@ export default function useAddFruit(): AddFruitData {
           console.error("Failed to get pre-signed URL.");
         }
       }
+    } catch (e) {
+      console.error(e);
     } finally {
 
       // TODO const s3_img_link = await uploadImage(file);

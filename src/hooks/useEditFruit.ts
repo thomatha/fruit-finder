@@ -54,8 +54,7 @@ export default function useEditFruit(): EditFruitData {
           const uploadResponse = await fetch(url, {
             method: "POST",
             headers: { 
-              "Cache-Control": 'no-cache',
-              "Origin": null,
+              "Cache-Control": 'no-cache'
             },
             body: formData,
           });
@@ -69,6 +68,8 @@ export default function useEditFruit(): EditFruitData {
           console.error("Failed to get pre-signed URL.");
         }
       }
+    } catch (e) {
+      console.error(e);
     } finally {
       const data = {
         name: fruit.name,
