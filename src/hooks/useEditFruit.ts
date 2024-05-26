@@ -54,8 +54,7 @@ export default function useEditFruit(): EditFruitData {
           const uploadResponse = await fetch(url, {
             method: "POST",
             headers: { 
-              "Cache-Control": 'no-cache',
-              "Origin": "https://fruit-finder.vercel.app",
+              "Cache-Control": 'no-cache'
             },
             body: formData,
           });
