@@ -55,7 +55,7 @@ export default function useAddFruit(): AddFruitData {
             method: "POST",
             headers: { 
               "Cache-Control": 'no-cache',
-              "Origin": null,
+              "Origin": "https://fruit-finder.vercel.app",
             },
             body: formData,
           });
@@ -69,6 +69,8 @@ export default function useAddFruit(): AddFruitData {
           console.error("Failed to get pre-signed URL.");
         }
       }
+    } catch (e) {
+      console.error(e);
     } finally {
 
       // TODO const s3_img_link = await uploadImage(file);

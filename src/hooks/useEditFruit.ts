@@ -55,7 +55,7 @@ export default function useEditFruit(): EditFruitData {
             method: "POST",
             headers: { 
               "Cache-Control": 'no-cache',
-              "Origin": null,
+              "Origin": "https://fruit-finder.vercel.app",
             },
             body: formData,
           });
@@ -69,6 +69,8 @@ export default function useEditFruit(): EditFruitData {
           console.error("Failed to get pre-signed URL.");
         }
       }
+    } catch (e) {
+      console.error(e);
     } finally {
       const data = {
         name: fruit.name,
