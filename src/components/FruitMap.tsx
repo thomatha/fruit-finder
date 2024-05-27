@@ -24,6 +24,7 @@ import SearchBar from "./SearchBar";
 import FruitFilter from "./FruitFilter";
 import ToasterAlert from "@/components/ToasterAlert";
 import { toast } from "react-hot-toast";
+import useWindowWidth from "../hooks/useWindowWidth";
 
 export default function FruitMap({ token, requestParams }) {
   const initialState = isNaN(Number(requestParams.data)) ? false : true;
@@ -42,6 +43,7 @@ export default function FruitMap({ token, requestParams }) {
     useLocationReviews(initialState ? Number(requestParams.data) : 1);
   const [openPanel, setOpenPanel] = useState(initialState ? true : false);
   const [selectedLocation, setSelectedLocation] = useState(0);
+  const { width } = useWindowWidth();
   const [forceRefresh, setForceRefresh] = useState(false);
   const [followMe, setFollowMe] = useState(
     !(requestParams.lat && requestParams.lng)
@@ -220,7 +222,12 @@ export default function FruitMap({ token, requestParams }) {
           {status === "authenticated" ? (
             <button
               className="btn btn-primary"
-              onClick={() => setAddModalOpen(true)}
+              onClick={() => {
+                setAddModalOpen(true);
+                if(width < 1225) {
+                  setOpenPanel(false);
+                }
+              }}
             >
               <PlusCircleIcon className="h-6 w-6" />{" "}
               <span className="hidden md:inline">Add Fruit</span>
