@@ -1,5 +1,5 @@
-import { type Fruit } from "@/types";
-import { useEffect, useState } from "react";
+import { type Fruit } from '@/types';
+import { useEffect, useState } from 'react';
 
 // This is the hook return type
 type FruitsData = [Fruit[], boolean];
@@ -11,7 +11,7 @@ function useFruits(): FruitsData {
   // This useEffect with empty [] gets called once when the component is created
   useEffect(() => {
     const fetchData = async () => {
-      const response = await fetch("/api/fruits");
+      const response = await fetch('/api/fruits');
       const data = await response.json();
 
       // Re-map api data to Fruit object

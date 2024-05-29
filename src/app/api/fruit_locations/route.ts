@@ -1,53 +1,53 @@
 import { sql } from '@vercel/postgres';
 import { NextResponse } from 'next/server';
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "../auth/authOptions";
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '../auth/authOptions';
 
 /**
  * GET endpoint for fetching fruit tree location data. All properties are URL search parameters
- * 
+ *
  * Option 1 - Get a specific fruit tree location
  * @property  {int} id the unique ID of a specific fruit tree location
- * 
+ *
  * For the rest of the options, can include an optional fruit type filter:
  * @property  {int} fruit_id the unique ID of a fruit type
- * 
+ *
  * Option 2 - Get all fruit tree locations within a radius of a specified point
  * @property  {float} latitude the latitude of the chosen point
  * @property  {float} longitude the longitude of the chosen point
  * @property  {float} radius the radius around the point to fetch fruit trees (miles by default)
- * 
+ *
  * Option 3 - Get all fruit tree locations within a bounding box
  * @property  {float} east the eastern side of the box
  * @property  {float} west the western side of the box
  * @property  {float} north the northern side of the box
  * @property  {float} south the southern side of the box
- * 
+ *
  * Option 4 - Get all fruit tree locations contributed by a specific user
  * @property  {int} user_id the user_id of the user for which to fetch fruit trees
- * 
- * @return {FruitTreeLocation[]} the list of fruit tree location records 
+ *
+ * @return {FruitTreeLocation[]} the list of fruit tree location records
  */
 export async function GET(request: Request) {
-    const { searchParams } = new URL(request.url);
-    const id = searchParams.get('id');
-    const latitude = searchParams.get('latitude');
-    const longitude = searchParams.get('longitude');
-    const radius = searchParams.get('radius');
-    const fruitId = searchParams.get('fruit_id');
-    const userId = searchParams.get('user_id');
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get('id');
+  const latitude = searchParams.get('latitude');
+  const longitude = searchParams.get('longitude');
+  const radius = searchParams.get('radius');
+  const fruitId = searchParams.get('fruit_id');
+  const userId = searchParams.get('user_id');
 
-    const east = searchParams.get('east');
-    const west = searchParams.get('west');
-    const north = searchParams.get('north');
-    const south = searchParams.get('south');
+  const east = searchParams.get('east');
+  const west = searchParams.get('west');
+  const north = searchParams.get('north');
+  const south = searchParams.get('south');
 
-    let fruitTreeLocations = null;
+  let fruitTreeLocations = null;
 
-    if(id) {
-        // Fetch a specific fruit tree location's information
-        try {
-            fruitTreeLocations = await sql`
+  if (id) {
+    // Fetch a specific fruit tree location's information
+    try {
+      fruitTreeLocations = await sql`
                 SELECT 
                     ftl.id,
                     ftl.name AS fruit_tree_name,
@@ -67,20 +67,28 @@ export async function GET(request: Request) {
                     ftl.id = ${id};
             `;
 
-            if(!fruitTreeLocations || fruitTreeLocations.rowCount === 0) {
-                return NextResponse.json({ error: 'Could not find a fruit tree location with the specified ID' }, { status: 404 });
-            }
-        } catch(e) {
-            return NextResponse.json({ error: 'An error occurred when fetching fruit tree locations' }, { status: 500 });
-        }
-    } else if(longitude && latitude && radius) {
-        // Fetch all fruit tree locations within a radius of a given point, using the Haversine formula
-        // This is in miles. If we wanted kilometers, we would plug in the KM constant instead
-        const earthRadiusMiles = 3959;
-        const earthRadiusKm = 6371;
-        if(fruitId) {
-            try {
-                fruitTreeLocations = await sql`
+      if (!fruitTreeLocations || fruitTreeLocations.rowCount === 0) {
+        return NextResponse.json(
+          {
+            error: 'Could not find a fruit tree location with the specified ID',
+          },
+          { status: 404 },
+        );
+      }
+    } catch (e) {
+      return NextResponse.json(
+        { error: 'An error occurred when fetching fruit tree locations' },
+        { status: 500 },
+      );
+    }
+  } else if (longitude && latitude && radius) {
+    // Fetch all fruit tree locations within a radius of a given point, using the Haversine formula
+    // This is in miles. If we wanted kilometers, we would plug in the KM constant instead
+    const earthRadiusMiles = 3959;
+    const earthRadiusKm = 6371;
+    if (fruitId) {
+      try {
+        fruitTreeLocations = await sql`
                     SELECT * FROM (
                         SELECT 
                             ftl.id,
@@ -108,12 +116,15 @@ export async function GET(request: Request) {
                     ORDER BY ftl.id DESC
                     LIMIT 100;
                 `;
-            } catch(e) {
-                return NextResponse.json({ error: 'An error occurred when fetching fruit tree locations' }, { status: 500 });
-            }
-        } else {
-            try {
-                fruitTreeLocations = await sql`
+      } catch (e) {
+        return NextResponse.json(
+          { error: 'An error occurred when fetching fruit tree locations' },
+          { status: 500 },
+        );
+      }
+    } else {
+      try {
+        fruitTreeLocations = await sql`
                     SELECT * FROM (
                         SELECT 
                             ftl.id,
@@ -140,15 +151,18 @@ export async function GET(request: Request) {
                     ORDER BY ftl.id DESC
                     LIMIT 100;
                 `;
-            } catch(e) {
-                return NextResponse.json({ error: 'An error occurred when fetching fruit tree locations' }, { status: 500 });
-            }
-        }
-    } else if(east && west && north && south) {
-        // Fetch all fruit tree locations within a specified bounding box
-        if(fruitId) {
-            try {
-                fruitTreeLocations = await sql`
+      } catch (e) {
+        return NextResponse.json(
+          { error: 'An error occurred when fetching fruit tree locations' },
+          { status: 500 },
+        );
+      }
+    }
+  } else if (east && west && north && south) {
+    // Fetch all fruit tree locations within a specified bounding box
+    if (fruitId) {
+      try {
+        fruitTreeLocations = await sql`
                     SELECT 
                         ftl.id,
                         ftl.name AS fruit_tree_name, 
@@ -166,12 +180,15 @@ export async function GET(request: Request) {
                     AND ftl.longitude BETWEEN ${west} AND ${east}
                     AND f.id = ${fruitId};
                 `;
-            } catch(e) {
-                return NextResponse.json({ error: 'An error occurred when fetching fruit tree locations' }, { status: 500 });
-            }
-        } else {
-            try {
-                fruitTreeLocations = await sql`
+      } catch (e) {
+        return NextResponse.json(
+          { error: 'An error occurred when fetching fruit tree locations' },
+          { status: 500 },
+        );
+      }
+    } else {
+      try {
+        fruitTreeLocations = await sql`
                     SELECT 
                         ftl.id,
                         ftl.name AS fruit_tree_name, 
@@ -189,15 +206,18 @@ export async function GET(request: Request) {
                     WHERE ftl.latitude BETWEEN ${south} AND ${north}
                     AND ftl.longitude BETWEEN ${west} AND ${east};
                 `;
-            } catch(e) {
-                return NextResponse.json({ error: 'An error occurred when fetching fruit tree locations' }, { status: 500 });
-            }
-        }
-    } else if(userId) {
-        // Fetch all fruit tree locations contributed by a specific user
-        if(fruitId) {
-            try {
-                fruitTreeLocations = await sql`
+      } catch (e) {
+        return NextResponse.json(
+          { error: 'An error occurred when fetching fruit tree locations' },
+          { status: 500 },
+        );
+      }
+    }
+  } else if (userId) {
+    // Fetch all fruit tree locations contributed by a specific user
+    if (fruitId) {
+      try {
+        fruitTreeLocations = await sql`
                     SELECT 
                         ftl.id,
                         ftl.name, 
@@ -217,12 +237,15 @@ export async function GET(request: Request) {
                     WHERE f.id = ${fruitId}
                     AND ftl.user_id = ${userId};
                 `;
-            } catch(e) {
-                return NextResponse.json({ error: 'An error occurred when fetching fruit tree locations' }, { status: 500 });
-            }
-        } else {
-            try {
-                fruitTreeLocations = await sql`
+      } catch (e) {
+        return NextResponse.json(
+          { error: 'An error occurred when fetching fruit tree locations' },
+          { status: 500 },
+        );
+      }
+    } else {
+      try {
+        fruitTreeLocations = await sql`
                     SELECT 
                         ftl.id,
                         ftl.name, 
@@ -241,17 +264,22 @@ export async function GET(request: Request) {
                         fruits f ON ftl.fruit_id = f.id
                     WHERE ftl.user_id = ${userId};
                 `;
-            } catch(e) {
-                return NextResponse.json({ error: 'An error occurred when fetching fruit tree locations' }, { status: 500 });
-            }
-        }
-    } else {
-        return NextResponse.json({ error: 'The URL search parameters could not be parsed' }, { status: 400 });
+      } catch (e) {
+        return NextResponse.json(
+          { error: 'An error occurred when fetching fruit tree locations' },
+          { status: 500 },
+        );
+      }
     }
-    
-    return NextResponse.json( fruitTreeLocations.rows , { status: 200 });
-}
+  } else {
+    return NextResponse.json(
+      { error: 'The URL search parameters could not be parsed' },
+      { status: 400 },
+    );
+  }
 
+  return NextResponse.json(fruitTreeLocations.rows, { status: 200 });
+}
 
 /**
  * POST endpoint for creating a new fruit tree location. All properties should be included in the request body
@@ -261,106 +289,146 @@ export async function GET(request: Request) {
  * @property  {float} longitude the new longitude of this fruit tree location
  * @property  {int} fruit_id the new fruit ID of this fruit tree location
  * @property  {int} user_id the new user ID of this fruit tree location
- * 
+ *
  * The following properties are optional
  * @property  {string} description the new description for this fruit tree location
  * @property  {string} s3_img_link the new s3 URL for this fruit tree location
- * 
+ *
  * @return { } no records
  */
 export async function POST(request: Request) {
-    const data = await request.json();
+  const data = await request.json();
 
-    if(!data || !data.name || !data.latitude || !data.longitude || !data.fruit_id || !data.user_id) {
-        return NextResponse.json({ error: 'The request body is missing at least one of the required attributes' }, { status: 400 });
-    }
+  if (
+    !data ||
+    !data.name ||
+    !data.latitude ||
+    !data.longitude ||
+    !data.fruit_id ||
+    !data.user_id
+  ) {
+    return NextResponse.json(
+      {
+        error:
+          'The request body is missing at least one of the required attributes',
+      },
+      { status: 400 },
+    );
+  }
 
-    const session = await getServerSession(authOptions);
+  const session = await getServerSession(authOptions);
 
-    // Check that session exists, and that the frontend session matches server session
-    if(!session || !session.user || data.user_id !== session.user.id) {
-        return NextResponse.json({error: 'You are not authorized to POST to this resource'}, {status: 401});
-    }
+  // Check that session exists, and that the frontend session matches server session
+  if (!session || !session.user || data.user_id !== session.user.id) {
+    return NextResponse.json(
+      { error: 'You are not authorized to POST to this resource' },
+      { status: 401 },
+    );
+  }
 
-    if(!data.description && !data.s3_img_link) {
-        try {
-            await sql`
+  if (!data.description && !data.s3_img_link) {
+    try {
+      await sql`
                 INSERT INTO fruit_tree_locations 
                     (name, latitude, longitude, fruit_id, user_id)
                 VALUES 
                     (${data.name}, ${data.latitude}, ${data.longitude}, ${data.fruit_id}, ${data.user_id});
             `;
-        } catch(e) {
-            return NextResponse.json({ error: 'An error occurred when creating fruit tree location' }, { status: 500 });
-        }
-    } else if (data.s3_img_link && !data.description) {
-        try {
-            await sql`
+    } catch (e) {
+      return NextResponse.json(
+        { error: 'An error occurred when creating fruit tree location' },
+        { status: 500 },
+      );
+    }
+  } else if (data.s3_img_link && !data.description) {
+    try {
+      await sql`
                 INSERT INTO fruit_tree_locations 
                     (name, latitude, longitude, s3_img_link, fruit_id, user_id)
                 VALUES 
                     (${data.name}, ${data.latitude}, ${data.longitude}, ${data.s3_img_link}, ${data.fruit_id}, ${data.user_id});
             `;
-        } catch(e) {
-            return NextResponse.json({ error: 'An error occurred when creating fruit tree location' }, { status: 500 });
-        }
-    } else if (!data.s3_img_link && data.description) {
-        try {
-            await sql`
+    } catch (e) {
+      return NextResponse.json(
+        { error: 'An error occurred when creating fruit tree location' },
+        { status: 500 },
+      );
+    }
+  } else if (!data.s3_img_link && data.description) {
+    try {
+      await sql`
                 INSERT INTO fruit_tree_locations 
                     (name, description, latitude, longitude, fruit_id, user_id)
                 VALUES 
                     (${data.name}, ${data.description}, ${data.latitude}, ${data.longitude}, ${data.fruit_id}, ${data.user_id});
             `;
-        } catch(e) {
-            return NextResponse.json({ error: 'An error occurred when creating fruit tree location' }, { status: 500 });
-        }
-    } else {
-        try {
-            await sql`
+    } catch (e) {
+      return NextResponse.json(
+        { error: 'An error occurred when creating fruit tree location' },
+        { status: 500 },
+      );
+    }
+  } else {
+    try {
+      await sql`
                 INSERT INTO fruit_tree_locations 
                     (name, description, latitude, longitude, s3_img_link, fruit_id, user_id)
                 VALUES 
                     (${data.name}, ${data.description}, ${data.latitude}, ${data.longitude}, ${data.s3_img_link}, ${data.fruit_id}, ${data.user_id});
             `;
-        } catch(e) {
-            return NextResponse.json({ error: 'An error occurred when creating fruit tree location' }, { status: 500 });
-        }
+    } catch (e) {
+      return NextResponse.json(
+        { error: 'An error occurred when creating fruit tree location' },
+        { status: 500 },
+      );
     }
+  }
 
-    return NextResponse.json({ }, { status: 201 });
+  return NextResponse.json({}, { status: 201 });
 }
-
 
 /**
  * PUT endpoint for updating fruit tree location data.
  * The following property is required, and is a URL search parameter
  * @property  {int} id the unique ID of a specific fruit tree location
- * 
+ *
  * The following properties are also required, and must be included in the request body
  * @property  {string} name the new name of this fruit tree location
  * @property  {float} latitude the new latitude of this fruit tree location
  * @property  {float} longitude the new longitude of this fruit tree location
  * @property  {int} fruit_id the new fruit_id of this fruit tree location
- * 
+ *
  * The following properties are optional, and may be included in the request body
  * @property  {string} description the new description for this fruit tree location
  * @property  {string} s3_img_link the new s3 URL for this fruit tree location
- * 
+ *
  * @return { } no records
  */
 export async function PUT(request: Request) {
-    const { searchParams } = new URL(request.url);
-    const id = searchParams.get('id');
-    const data = await request.json();
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get('id');
+  const data = await request.json();
 
-    if(!(id) || !data || !data.name || !data.latitude || !data.longitude || !data.fruit_id) {
-        return NextResponse.json({ error: 'The request body is missing at least one of the required attributes' }, { status: 400 });
-    }
+  if (
+    !id ||
+    !data ||
+    !data.name ||
+    !data.latitude ||
+    !data.longitude ||
+    !data.fruit_id
+  ) {
+    return NextResponse.json(
+      {
+        error:
+          'The request body is missing at least one of the required attributes',
+      },
+      { status: 400 },
+    );
+  }
 
-    if(!data.description && !data.s3_img_link) {
-        try {
-            await sql`
+  if (!data.description && !data.s3_img_link) {
+    try {
+      await sql`
                 UPDATE fruit_tree_locations
                 SET 
                     name = ${data.name},
@@ -369,12 +437,15 @@ export async function PUT(request: Request) {
                     fruit_id = ${data.fruit_id}
                 WHERE id = ${id};
             `;
-        } catch(e) {
-            return NextResponse.json({ error: 'An error occurred when updating fruit tree location' }, { status: 500 });
-        }
-    } else if(!data.description && data.s3_img_link) {
-        try {
-            await sql`
+    } catch (e) {
+      return NextResponse.json(
+        { error: 'An error occurred when updating fruit tree location' },
+        { status: 500 },
+      );
+    }
+  } else if (!data.description && data.s3_img_link) {
+    try {
+      await sql`
                 UPDATE fruit_tree_locations
                 SET 
                     name = ${data.name},
@@ -384,12 +455,15 @@ export async function PUT(request: Request) {
                     s3_img_link = ${data.s3_img_link}
                 WHERE id = ${id};
             `;
-        } catch(e) {
-            return NextResponse.json({ error: 'An error occurred when updating fruit tree location' }, { status: 500 });
-        }
-    } else if(data.description && !data.s3_img_link) {
-        try {
-            await sql`
+    } catch (e) {
+      return NextResponse.json(
+        { error: 'An error occurred when updating fruit tree location' },
+        { status: 500 },
+      );
+    }
+  } else if (data.description && !data.s3_img_link) {
+    try {
+      await sql`
                 UPDATE fruit_tree_locations
                 SET 
                     name = ${data.name},
@@ -399,12 +473,15 @@ export async function PUT(request: Request) {
                     description = ${data.description}
                 WHERE id = ${id};
             `;
-        } catch(e) {
-            return NextResponse.json({ error: 'An error occurred when updating fruit tree location' }, { status: 500 });
-        }
-    } else {
-        try {
-            await sql`
+    } catch (e) {
+      return NextResponse.json(
+        { error: 'An error occurred when updating fruit tree location' },
+        { status: 500 },
+      );
+    }
+  } else {
+    try {
+      await sql`
                 UPDATE fruit_tree_locations
                 SET 
                     name = ${data.name},
@@ -415,41 +492,52 @@ export async function PUT(request: Request) {
                     s3_img_link = ${data.s3_img_link}
                 WHERE id = ${id};
             `;
-        } catch(e) {
-            return NextResponse.json({ error: 'An error occurred when updating fruit tree location' }, { status: 500 });
-        }
+    } catch (e) {
+      return NextResponse.json(
+        { error: 'An error occurred when updating fruit tree location' },
+        { status: 500 },
+      );
     }
+  }
 
-    return NextResponse.json({ }, { status: 200 });
+  return NextResponse.json({}, { status: 200 });
 }
-
 
 /**
  * DELETE endpoint for deleting fruit tree location data. All properties are URL search parameters
  * @property  {int} id the unique ID of a specific fruit tree location
- * 
+ *
  * @return { } no records
  */
 export async function DELETE(request: Request) {
-    const { searchParams } = new URL(request.url);
-    const id = searchParams.get('id');
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get('id');
 
-    if(!id) {
-        return NextResponse.json({ error: 'The request body is missing at least one of the required attributes' }, { status: 400 });
-    }
-    
-    try {
-        await sql`
+  if (!id) {
+    return NextResponse.json(
+      {
+        error:
+          'The request body is missing at least one of the required attributes',
+      },
+      { status: 400 },
+    );
+  }
+
+  try {
+    await sql`
             DELETE FROM 
                 fruit_tree_locations 
             WHERE 
                 id = ${id};
         `;
-    } catch(e) {
-        return NextResponse.json({ error: 'An error occurred when deleting fruit tree location' }, { status: 500 });
-    }
+  } catch (e) {
+    return NextResponse.json(
+      { error: 'An error occurred when deleting fruit tree location' },
+      { status: 500 },
+    );
+  }
 
-    return NextResponse.json({ }, { status: 200 });
+  return NextResponse.json({}, { status: 200 });
 }
 
 /*

@@ -6,9 +6,9 @@ import { NextResponse } from 'next/server';
  * @return {Fruit[]} the list of fruit type records
  */
 export async function GET(request: Request) {
-    // Fetch a list of fruit types (for populating fruit filter)
-    try {
-        const fruitList = await sql`
+  // Fetch a list of fruit types (for populating fruit filter)
+  try {
+    const fruitList = await sql`
             SELECT 
                 f.id AS fruit_id,
                 f.name AS fruit_name, 
@@ -16,8 +16,10 @@ export async function GET(request: Request) {
             FROM 
                 fruits f;
         `;
-        return NextResponse.json( fruitList.rows, { status: 200 });
-    } catch(e) {
-        return NextResponse.json('An error occurred when fetching fruit list', { status: 500 });
-    }
+    return NextResponse.json(fruitList.rows, { status: 200 });
+  } catch (e) {
+    return NextResponse.json('An error occurred when fetching fruit list', {
+      status: 500,
+    });
+  }
 }

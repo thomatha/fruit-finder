@@ -1,30 +1,33 @@
-"use client";
+'use client';
 
-import { Fragment, useEffect, useRef, useState } from "react";
-import { useSession } from "next-auth/react";
-import { useGeolocation } from "@uidotdev/usehooks";
-import Map, { Marker, type MapRef } from "react-map-gl";
-import { PlusCircleIcon, ExclamationTriangleIcon } from "@heroicons/react/16/solid";
+import { Fragment, useEffect, useRef, useState } from 'react';
+import { useSession } from 'next-auth/react';
+import { useGeolocation } from '@uidotdev/usehooks';
+import Map, { Marker, type MapRef } from 'react-map-gl';
+import {
+  PlusCircleIcon,
+  ExclamationTriangleIcon,
+} from '@heroicons/react/16/solid';
 import {
   GlobeEuropeAfricaIcon,
   MapIcon,
   MapPinIcon,
-} from "@heroicons/react/24/outline";
-import useNearbyFruits from "@/hooks/useNearbyFruits";
-import useSpecificFruit from "@/hooks/useSpecificFruit";
-import useLocationReviews from "@/hooks/useLocationReviews";
-import "mapbox-gl/dist/mapbox-gl.css";
-import { Fruit, FruitLocation } from "@/types";
-import fruitIcon from "@/utils/fruitIcon";
-import AddModal from "./AddModal";
-import EditModal from "./EditModal";
-import DeleteModal from "./DeleteModal";
-import SideBar from "./SideBar";
-import SearchBar from "./SearchBar";
-import FruitFilter from "./FruitFilter";
-import ToasterAlert from "@/components/ToasterAlert";
-import { toast } from "react-hot-toast";
-import useWindowWidth from "../hooks/useWindowWidth";
+} from '@heroicons/react/24/outline';
+import useNearbyFruits from '@/hooks/useNearbyFruits';
+import useSpecificFruit from '@/hooks/useSpecificFruit';
+import useLocationReviews from '@/hooks/useLocationReviews';
+import 'mapbox-gl/dist/mapbox-gl.css';
+import { Fruit, FruitLocation } from '@/types';
+import fruitIcon from '@/utils/fruitIcon';
+import AddModal from './AddModal';
+import EditModal from './EditModal';
+import DeleteModal from './DeleteModal';
+import SideBar from './SideBar';
+import SearchBar from './SearchBar';
+import FruitFilter from './FruitFilter';
+import ToasterAlert from '@/components/ToasterAlert';
+import { toast } from 'react-hot-toast';
+import useWindowWidth from '../hooks/useWindowWidth';
 
 export default function FruitMap({ token, requestParams }) {
   const initialState = isNaN(Number(requestParams.data)) ? false : true;
@@ -37,7 +40,7 @@ export default function FruitMap({ token, requestParams }) {
   const [fruits, setBounds, setFruitFilter] = useNearbyFruits();
   const [isStreet, setIsStreet] = useState(true);
   const [selectedFruit, setSelectedFruit] = useSpecificFruit(
-    initialState ? Number(requestParams.data) : 1
+    initialState ? Number(requestParams.data) : 1,
   );
   const [selectedReviews, avgRating, reviewCount, setSelectedReviews] =
     useLocationReviews(initialState ? Number(requestParams.data) : 1);
@@ -46,7 +49,7 @@ export default function FruitMap({ token, requestParams }) {
   const { width } = useWindowWidth();
   const [forceRefresh, setForceRefresh] = useState(false);
   const [followMe, setFollowMe] = useState(
-    !(requestParams.lat && requestParams.lng)
+    !(requestParams.lat && requestParams.lng),
   );
   const initialLat = requestParams.lat ? requestParams.lat : null;
   const initialLng = requestParams.lng ? requestParams.lng : null;
@@ -80,7 +83,7 @@ export default function FruitMap({ token, requestParams }) {
       bounds?._ne.lat,
       bounds?._ne.lng,
       bounds?._sw.lng,
-      bounds?._sw.lat
+      bounds?._sw.lat,
     );
   };
 
@@ -101,25 +104,25 @@ export default function FruitMap({ token, requestParams }) {
   const retrieveSearch = (e: any) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    let searchTxt = String(formData.get("searchText"));
-    if (searchTxt != "") {
+    let searchTxt = String(formData.get('searchText'));
+    if (searchTxt != '') {
       const fetchSearch = async () => {
         const searchResponse = await fetch(
-          `https://api.mapbox.com/search/searchbox/v1/suggest?q=${searchTxt}&types=place,country,region,city&access_token=${token}&session_token=${token}`
+          `https://api.mapbox.com/search/searchbox/v1/suggest?q=${searchTxt}&types=place,country,region,city&access_token=${token}&session_token=${token}`,
         );
         const searchData = await searchResponse.json();
         if (!searchResponse.ok) {
-          toast.error("Error retreiving your search suggestions.");
+          toast.error('Error retreiving your search suggestions.');
         } else {
           if (searchData.suggestions.length > 0) {
             let suggestionId = searchData.suggestions[0].mapbox_id;
             const fetchSuggestion = async () => {
               const suggestionResponse = await fetch(
-                `https://api.mapbox.com/search/searchbox/v1/retrieve/${suggestionId}?access_token=${token}&session_token=${token}`
+                `https://api.mapbox.com/search/searchbox/v1/retrieve/${suggestionId}?access_token=${token}&session_token=${token}`,
               );
               const suggestionData = await suggestionResponse.json();
               if (!suggestionResponse.ok) {
-                toast.error("Error retreiving your search location.");
+                toast.error('Error retreiving your search location.');
               } else {
                 if (suggestionData) {
                   let coords = suggestionData.features[0].properties.bbox;
@@ -129,7 +132,7 @@ export default function FruitMap({ token, requestParams }) {
             };
             fetchSuggestion();
           } else {
-            toast.error("No locations found. Please try a new search.");
+            toast.error('No locations found. Please try a new search.');
           }
         }
       };
@@ -149,11 +152,11 @@ export default function FruitMap({ token, requestParams }) {
             zoom: 16,
           }}
           // TODO - make height fill view port:
-          style={{ height: "88vh" }}
+          style={{ height: '88vh' }}
           mapStyle={
             isStreet
-              ? "mapbox://styles/mapbox/streets-v12"
-              : "mapbox://styles/mapbox/satellite-streets-v12"
+              ? 'mapbox://styles/mapbox/streets-v12'
+              : 'mapbox://styles/mapbox/satellite-streets-v12'
           }
           onDragEnd={updateBounds}
           onLoad={updateBounds}
@@ -219,17 +222,17 @@ export default function FruitMap({ token, requestParams }) {
           )}
         </div>
         <div className="navbar-center">
-          {status === "authenticated" ? (
+          {status === 'authenticated' ? (
             <button
               className="btn btn-primary"
               onClick={() => {
                 setAddModalOpen(true);
-                if(width < 1225) {
+                if (width < 1225) {
                   setOpenPanel(false);
                 }
               }}
             >
-              <PlusCircleIcon className="h-6 w-6" />{" "}
+              <PlusCircleIcon className="h-6 w-6" />{' '}
               <span className="hidden md:inline">Add Fruit</span>
             </button>
           ) : (
@@ -240,14 +243,14 @@ export default function FruitMap({ token, requestParams }) {
         <div className="navbar-end">
           <div className="join">
             <button
-              className={`btn btn-sm join-item ${isStreet ? "btn-active" : ""}`}
+              className={`btn btn-sm join-item ${isStreet ? 'btn-active' : ''}`}
               onClick={() => setIsStreet(true)}
             >
               <MapIcon className="h-6 w-6" />
               <span className="hidden md:inline">Street</span>
             </button>
             <button
-              className={`btn btn-sm join-item ${isStreet ? "" : "btn-active"}`}
+              className={`btn btn-sm join-item ${isStreet ? '' : 'btn-active'}`}
               onClick={() => setIsStreet(false)}
             >
               <GlobeEuropeAfricaIcon className="h-6 w-6" />

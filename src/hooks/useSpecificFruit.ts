@@ -1,27 +1,22 @@
-import { type FruitLocationDetail } from "@/types";
-import { useEffect, useState } from "react";
+import { type FruitLocationDetail } from '@/types';
+import { useEffect, useState } from 'react';
 
-type SpecificFruit = [
-  FruitLocationDetail,
-  (id: number) => void
-];
+type SpecificFruit = [FruitLocationDetail, (id: number) => void];
 
 function useSpecificFruit(props): SpecificFruit {
   const [fruit, setFruit] = useState<FruitLocationDetail>();
-  const [id, setId] = useState<number>(props? props : 1);
+  const [id, setId] = useState<number>(props ? props : 1);
 
   useEffect(() => {
     const fetchData = async () => {
-      if(!id) {
+      if (!id) {
         setFruit(null);
         return;
       }
-      const response = await fetch(
-        `/api/fruit_locations?id=${id}`
-      );
+      const response = await fetch(`/api/fruit_locations?id=${id}`);
       const data = await response.json();
       // Re-map api data to FruitLocationDetail object
-      if(!data || data.error) {
+      if (!data || data.error) {
         setFruit(null);
         return;
       }

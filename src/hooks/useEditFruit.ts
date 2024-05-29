@@ -1,7 +1,7 @@
-import { Fruit } from "@/types";
-import { useState } from "react";
-const AWS_BUCKET_NAME = "fruitfinder";
-const AWS_REGION = "us-east-2";
+import { Fruit } from '@/types';
+import { useState } from 'react';
+const AWS_BUCKET_NAME = 'fruitfinder';
+const AWS_REGION = 'us-east-2';
 
 // This is the hook return type
 type EditFruitData = [
@@ -11,10 +11,10 @@ type EditFruitData = [
     latitude: number,
     longitude: number,
     notes: string,
-    file: File
+    file: File,
   ) => void,
   boolean,
-  boolean
+  boolean,
 ];
 
 export default function useEditFruit(): EditFruitData {
@@ -27,17 +27,17 @@ export default function useEditFruit(): EditFruitData {
     latitude: number,
     longitude: number,
     notes: string,
-    file: File
+    file: File,
   ): Promise<void> {
     setSaving(true);
 
     let s3_img_link = null;
     try {
       if (file) {
-        const response = await fetch("/api/images", {
-          method: "POST",
+        const response = await fetch('/api/images', {
+          method: 'POST',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify({ filename: file.name, contentType: file.type }),
         });
@@ -49,12 +49,12 @@ export default function useEditFruit(): EditFruitData {
           Object.entries(fields).forEach(([key, value]) => {
             formData.append(key, value as string);
           });
-          formData.append("file", file);
+          formData.append('file', file);
 
           const uploadResponse = await fetch(url, {
-            method: "POST",
-            headers: { 
-              "Cache-Control": 'no-cache'
+            method: 'POST',
+            headers: {
+              'Cache-Control': 'no-cache',
             },
             body: formData,
           });
@@ -62,10 +62,10 @@ export default function useEditFruit(): EditFruitData {
           if (uploadResponse.ok) {
             s3_img_link = `https://${AWS_BUCKET_NAME}.s3.${AWS_REGION}.amazonaws.com/${fields.key}`;
           } else {
-            console.error("S3 Upload Error:", uploadResponse);
+            console.error('S3 Upload Error:', uploadResponse);
           }
         } else {
-          console.error("Failed to get pre-signed URL.");
+          console.error('Failed to get pre-signed URL.');
         }
       }
     } catch (e) {
@@ -81,9 +81,9 @@ export default function useEditFruit(): EditFruitData {
       };
       try {
         const response = await fetch(`/api/fruit_locations?id=${tree}`, {
-          method: "PUT", // Specify the HTTP method as PUT
+          method: 'PUT', // Specify the HTTP method as PUT
           headers: {
-            "Content-Type": "application/json", // Set the Content-Type header to indicate JSON data
+            'Content-Type': 'application/json', // Set the Content-Type header to indicate JSON data
           },
           body: JSON.stringify(data), // Stringify the JavaScript object into JSON format
         });

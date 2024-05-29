@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import React from "react";
-import { useState } from "react";
-import SlidingPanel from "react-sliding-side-panel";
-import Image from "next/image";
-import defaultFruitImg from "../../public/img/default_fruit.png";
-import ReviewModal from "../components/ReviewModal";
-import { FruitLocationReview } from "@/types";
-import { PencilSquareIcon, TrashIcon } from "@heroicons/react/16/solid";
-import { useSession } from "next-auth/react";
-import useWindowWidth from "../hooks/useWindowWidth";
+import React from 'react';
+import { useState } from 'react';
+import SlidingPanel from 'react-sliding-side-panel';
+import Image from 'next/image';
+import defaultFruitImg from '../../public/img/default_fruit.png';
+import ReviewModal from '../components/ReviewModal';
+import { FruitLocationReview } from '@/types';
+import { PencilSquareIcon, TrashIcon } from '@heroicons/react/16/solid';
+import { useSession } from 'next-auth/react';
+import useWindowWidth from '../hooks/useWindowWidth';
 
 const SideBar = ({
   openPanel,
@@ -34,26 +34,21 @@ const SideBar = ({
 
   return (
     <SlidingPanel
-      type={"left"}
+      type={'left'}
       isOpen={openPanel}
       backdropClicked={() => setOpenPanel(false)}
       size={
-        width > 1225 ?
-          22
-        : 
-        width > 1000 ?
-          28
-        :
-        width > 850 ?
-          34
-        :
-        width > 750 ?
-          40
-        :
-        width > 600 ?
-          46
-        :
-          75
+        width > 1225
+          ? 22
+          : width > 1000
+            ? 28
+            : width > 850
+              ? 34
+              : width > 750
+                ? 40
+                : width > 600
+                  ? 46
+                  : 75
       }
       panelClassName=""
       panelContainerClassName="my-20 bg-base-100"
@@ -81,7 +76,7 @@ const SideBar = ({
         <div className="px-4 text-start">
           <div>
             <span className="font-semibold text-lg">
-              {selectedFruit ? selectedFruit.name : ""}
+              {selectedFruit ? selectedFruit.name : ''}
             </span>
           </div>
           {/*Reviews average, placeholder until fleshing out that system more*/}
@@ -110,35 +105,47 @@ const SideBar = ({
               <p className="whitespace-pre-wrap mb-4">
                 {selectedFruit?.description}
               </p>
-              {data?.user?.id && data?.user?.id === selectedFruit?.user_id ?
-              <div>
-                <div><span className="font-semibold text-xs">(You submitted this fruit tree)</span></div>
+              {data?.user?.id && data?.user?.id === selectedFruit?.user_id ? (
                 <div>
-                    <button className="btn btn-sm mb-2" onClick={() => {
+                  <div>
+                    <span className="font-semibold text-xs">
+                      (You submitted this fruit tree)
+                    </span>
+                  </div>
+                  <div>
+                    <button
+                      className="btn btn-sm mb-2"
+                      onClick={() => {
                         setEditModalOpen(true);
                         setDeleteModalOpen(false);
-                        if(width < 1225) {
+                        if (width < 1225) {
                           setOpenPanel(false);
                         }
-                    }}>
-                        <PencilSquareIcon className="h-6 w-6" />{" "}
-                        <span className="hidden md:inline">Edit</span>
+                      }}
+                    >
+                      <PencilSquareIcon className="h-6 w-6" />{' '}
+                      <span className="hidden md:inline">Edit</span>
                     </button>
-                </div>
-                <div>
-                    <button className="btn btn-sm" onClick={() => {
+                  </div>
+                  <div>
+                    <button
+                      className="btn btn-sm"
+                      onClick={() => {
                         setDeleteModalOpen(true);
                         setEditModalOpen(false);
-                        if(width < 1225) {
+                        if (width < 1225) {
                           setOpenPanel(false);
                         }
-                    }}>
-                        <TrashIcon className="h-6 w-6" />{" "}
-                        <span className="hidden md:inline">Delete</span>
+                      }}
+                    >
+                      <TrashIcon className="h-6 w-6" />{' '}
+                      <span className="hidden md:inline">Delete</span>
                     </button>
+                  </div>
                 </div>
-              </div>
-              : <></>}
+              ) : (
+                <></>
+              )}
             </div>
           ) : (
             <div>
@@ -230,7 +237,7 @@ const SideBar = ({
               <div className="flex justify-center">
                 <ReviewModal
                   treeId={selectedLocation}
-                  treeDesc={selectedFruit ? selectedFruit.name : ""}
+                  treeDesc={selectedFruit ? selectedFruit.name : ''}
                   onReviewSubmit={refreshReviewData}
                 />
               </div>
