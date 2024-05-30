@@ -1,11 +1,11 @@
-import { Fruit, type FruitLocation } from "@/types";
-import { useEffect, useState } from "react";
+import { Fruit, type FruitLocation } from '@/types';
+import { useEffect, useState } from 'react';
 
 type NearbyFruits = [
   FruitLocation[],
   (n: number, e: number, w: number, s: number) => void,
   (filter: Fruit) => void,
-  Fruit
+  Fruit,
 ];
 
 function useNearbyFruits(): NearbyFruits {
@@ -20,7 +20,7 @@ function useNearbyFruits(): NearbyFruits {
   useEffect(() => {
     const fetchData = async () => {
       const response = await fetch(
-        `/api/fruit_locations?east=${east}&west=${west}&north=${north}&south=${south}`
+        `/api/fruit_locations?east=${east}&west=${west}&north=${north}&south=${south}`,
       );
       const data = await response.json();
 

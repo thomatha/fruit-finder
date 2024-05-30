@@ -1,15 +1,15 @@
-import { useState } from "react";
+import { useState } from 'react';
 import {
   ExclamationCircleIcon,
   CameraIcon,
   CheckIcon,
-} from "@heroicons/react/16/solid";
-import fruitIcon from "@/utils/fruitIcon";
-import AddMap from "./AddMap";
-import useFruits from "@/hooks/useFruits";
-import useAddFruit from "@/hooks/useAddFruit";
-import { Fruit } from "@/types";
-import { useSession } from "next-auth/react";
+} from '@heroicons/react/16/solid';
+import fruitIcon from '@/utils/fruitIcon';
+import AddMap from './AddMap';
+import useFruits from '@/hooks/useFruits';
+import useAddFruit from '@/hooks/useAddFruit';
+import { Fruit } from '@/types';
+import { useSession } from 'next-auth/react';
 
 export default function AddModal({ token, lat, lng, onClose, onAdd }) {
   const [fruitType, setFruitType] = useState<Fruit>();
@@ -98,10 +98,10 @@ export default function AddModal({ token, lat, lng, onClose, onAdd }) {
           />
           <button
             className={`btn rounded-full btn-lg ${
-              file ? "btn-success" : "btn-primary"
+              file ? 'btn-success' : 'btn-primary'
             } px-4`}
             onClick={() => {
-              document.getElementById("file").click();
+              document.getElementById('file').click();
             }}
           >
             {file ? (
@@ -109,7 +109,7 @@ export default function AddModal({ token, lat, lng, onClose, onAdd }) {
             ) : (
               <CameraIcon className="w-8 h-8" />
             )}
-            {file ? "Change Photo" : "Add Photo"}
+            {file ? 'Change Photo' : 'Add Photo'}
           </button>
         </div>
         <div className="modal-action">
@@ -120,7 +120,7 @@ export default function AddModal({ token, lat, lng, onClose, onAdd }) {
               saveFruit();
             }}
           >
-            {saving ? "Saving..." : "Add"}
+            {saving ? 'Saving...' : 'Add'}
           </button>
           <button className="btn btn-outline" onClick={() => onClose()}>
             Cancel

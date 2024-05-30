@@ -1,7 +1,7 @@
-import { Fruit } from "@/types";
-import { useState } from "react";
-const AWS_BUCKET_NAME = "fruitfinder";
-const AWS_REGION = "us-east-2";
+import { Fruit } from '@/types';
+import { useState } from 'react';
+const AWS_BUCKET_NAME = 'fruitfinder';
+const AWS_REGION = 'us-east-2';
 
 // This is the hook return type
 type AddFruitData = [
@@ -14,7 +14,7 @@ type AddFruitData = [
     user_id: string,
   ) => void,
   boolean,
-  boolean
+  boolean,
 ];
 
 export default function useAddFruit(): AddFruitData {
@@ -34,10 +34,10 @@ export default function useAddFruit(): AddFruitData {
     let s3_img_link = null;
     try {
       if (file) {
-        const response = await fetch("/api/images", {
-          method: "POST",
+        const response = await fetch('/api/images', {
+          method: 'POST',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify({ filename: file.name, contentType: file.type }),
         });
@@ -49,12 +49,12 @@ export default function useAddFruit(): AddFruitData {
           Object.entries(fields).forEach(([key, value]) => {
             formData.append(key, value as string);
           });
-          formData.append("file", file);
+          formData.append('file', file);
 
           const uploadResponse = await fetch(url, {
-            method: "POST",
-            headers: { 
-              "Cache-Control": 'no-cache'
+            method: 'POST',
+            headers: {
+              'Cache-Control': 'no-cache',
             },
             body: formData,
           });
@@ -62,16 +62,15 @@ export default function useAddFruit(): AddFruitData {
           if (uploadResponse.ok) {
             s3_img_link = `https://${AWS_BUCKET_NAME}.s3.${AWS_REGION}.amazonaws.com/${fields.key}`;
           } else {
-            console.error("S3 Upload Error:", uploadResponse);
+            console.error('S3 Upload Error:', uploadResponse);
           }
         } else {
-          console.error("Failed to get pre-signed URL.");
+          console.error('Failed to get pre-signed URL.');
         }
       }
     } catch (e) {
       console.error(e);
     } finally {
-
       // TODO const s3_img_link = await uploadImage(file);
 
       const data = {
@@ -84,10 +83,10 @@ export default function useAddFruit(): AddFruitData {
         user_id,
       };
       try {
-        const response = await fetch("/api/fruit_locations", {
-          method: "POST", // Specify the HTTP method as POST
+        const response = await fetch('/api/fruit_locations', {
+          method: 'POST', // Specify the HTTP method as POST
           headers: {
-            "Content-Type": "application/json", // Set the Content-Type header to indicate JSON data
+            'Content-Type': 'application/json', // Set the Content-Type header to indicate JSON data
           },
           body: JSON.stringify(data), // Stringify the JavaScript object into JSON format
         });

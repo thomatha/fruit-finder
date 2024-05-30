@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 function getWindowWidth() {
   const { innerWidth: width } = window;
   return {
-    width
+    width,
   };
 }
 

@@ -1,14 +1,14 @@
-import { useState } from "react";
+import { useState } from 'react';
 import {
   ExclamationCircleIcon,
   CameraIcon,
   CheckIcon,
-} from "@heroicons/react/16/solid";
-import fruitIcon from "@/utils/fruitIcon";
-import AddMap from "./AddMap";
-import useFruits from "@/hooks/useFruits";
-import useEditFruit from "@/hooks/useEditFruit";
-import { Fruit, FruitLocationDetail } from "@/types";
+} from '@heroicons/react/16/solid';
+import fruitIcon from '@/utils/fruitIcon';
+import AddMap from './AddMap';
+import useFruits from '@/hooks/useFruits';
+import useEditFruit from '@/hooks/useEditFruit';
+import { Fruit, FruitLocationDetail } from '@/types';
 
 export default function EditModal({ token, tree, onEdit, onClose }) {
   const [latitude, setLatitude] = useState(0);
@@ -21,9 +21,11 @@ export default function EditModal({ token, tree, onEdit, onClose }) {
   const [notes, setNotes] = useState<string | null>();
 
   async function saveFruit() {
-    let fruitToPut = fruitType ? fruitType : {id: oldTree.fruit_id, name: oldTree.fruit};
+    let fruitToPut = fruitType
+      ? fruitType
+      : { id: oldTree.fruit_id, name: oldTree.fruit };
     let latToPut = latitude ? latitude : oldTree.latitude;
-    let lngToPut = longitude ? longitude: oldTree.longitude;
+    let lngToPut = longitude ? longitude : oldTree.longitude;
     let notesToPut = notes ? notes : oldTree.description;
 
     editFruit(oldTree.id, fruitToPut, latToPut, lngToPut, notesToPut, file);
@@ -53,8 +55,8 @@ export default function EditModal({ token, tree, onEdit, onClose }) {
 
         <AddMap
           fruit={fruitType?.name}
-          latitude={latitude ? latitude: oldTree.latitude}
-          longitude={longitude? longitude: oldTree.longitude}
+          latitude={latitude ? latitude : oldTree.latitude}
+          longitude={longitude ? longitude : oldTree.longitude}
           token={token}
           onClick={(lt, ln) => {
             setLatitude(lt);
@@ -71,19 +73,19 @@ export default function EditModal({ token, tree, onEdit, onClose }) {
           }}
         >
           {fruits.map((fruit: Fruit) => {
-              if(oldTree.fruit === fruit.name) {
-                return (
-                  <option key={fruit.id} value={fruit.id} selected>
-                    {fruitIcon(fruit.name)} {fruit.name}
-                  </option>
-                )
-              } else {
-                return (
-                  <option key={fruit.id} value={fruit.id}>
-                    {fruitIcon(fruit.name)} {fruit.name}
-                  </option>
-                )
-              }
+            if (oldTree.fruit === fruit.name) {
+              return (
+                <option key={fruit.id} value={fruit.id} selected>
+                  {fruitIcon(fruit.name)} {fruit.name}
+                </option>
+              );
+            } else {
+              return (
+                <option key={fruit.id} value={fruit.id}>
+                  {fruitIcon(fruit.name)} {fruit.name}
+                </option>
+              );
+            }
           })}
         </select>
         <textarea
@@ -108,10 +110,10 @@ export default function EditModal({ token, tree, onEdit, onClose }) {
           />
           <button
             className={`btn rounded-full btn-lg ${
-              file ? "btn-success" : "btn-primary"
+              file ? 'btn-success' : 'btn-primary'
             } px-4`}
             onClick={() => {
-              document.getElementById("file").click();
+              document.getElementById('file').click();
             }}
           >
             {file ? (
@@ -119,7 +121,7 @@ export default function EditModal({ token, tree, onEdit, onClose }) {
             ) : (
               <CameraIcon className="w-8 h-8" />
             )}
-            {file ? "Change Photo" : "Update Photo"}
+            {file ? 'Change Photo' : 'Update Photo'}
           </button>
         </div>
         <div className="modal-action">
@@ -130,7 +132,7 @@ export default function EditModal({ token, tree, onEdit, onClose }) {
               saveFruit();
             }}
           >
-            {saving ? "Saving..." : "Edit"}
+            {saving ? 'Saving...' : 'Edit'}
           </button>
           <button className="btn btn-outline" onClick={() => onClose()}>
             Cancel

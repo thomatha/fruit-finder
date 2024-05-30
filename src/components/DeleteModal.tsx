@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { ExclamationCircleIcon } from "@heroicons/react/16/solid";
-import useDeleteFruit from "@/hooks/useDeleteFruit";
-import { FruitLocationDetail } from "@/types";
+import { useState } from 'react';
+import { ExclamationCircleIcon } from '@heroicons/react/16/solid';
+import useDeleteFruit from '@/hooks/useDeleteFruit';
+import { FruitLocationDetail } from '@/types';
 
 export default function EditModal({ tree, onDelete, onClose }) {
   const [oldTree, setOldTree] = useState<FruitLocationDetail | null>(tree);
@@ -33,7 +33,11 @@ export default function EditModal({ tree, onDelete, onClose }) {
           <></>
         )}
         <div>
-          <span>Are you <strong>sure</strong> you want to delete this fruit tree location?</span><br/>
+          <span>
+            Are you <strong>sure</strong> you want to delete this fruit tree
+            location?
+          </span>
+          <br />
           <span>Once deleted, it cannot be recovered.</span>
         </div>
         <div className="modal-action">
@@ -44,7 +48,7 @@ export default function EditModal({ tree, onDelete, onClose }) {
               removeFruit();
             }}
           >
-            {saving ? "Deleting..." : "Delete"}
+            {saving ? 'Deleting...' : 'Delete'}
           </button>
           <button className="btn btn-outline" onClick={() => onClose()}>
             Cancel

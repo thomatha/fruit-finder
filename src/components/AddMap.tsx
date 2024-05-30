@@ -1,7 +1,7 @@
-import { useRef, useState } from "react";
-import Map, { Marker, type MapRef } from "react-map-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
-import fruitIcon from "@/utils/fruitIcon";
+import { useRef, useState } from 'react';
+import Map, { Marker, type MapRef } from 'react-map-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
+import fruitIcon from '@/utils/fruitIcon';
 
 export default function AddMap({ fruit, latitude, longitude, token, onClick }) {
   const mapRef = useRef<MapRef>();
@@ -17,11 +17,11 @@ export default function AddMap({ fruit, latitude, longitude, token, onClick }) {
           latitude: latitude,
           zoom: 19,
         }}
-        style={{ height: "30vh" }}
+        style={{ height: '30vh' }}
         mapStyle={
           isStreet
-            ? "mapbox://styles/mapbox/streets-v12"
-            : "mapbox://styles/mapbox/satellite-streets-v12"
+            ? 'mapbox://styles/mapbox/streets-v12'
+            : 'mapbox://styles/mapbox/satellite-streets-v12'
         }
         onClick={(e) => {
           onClick(e.lngLat.lat, e.lngLat.lng);
