@@ -15,7 +15,6 @@ import {
 } from '@heroicons/react/24/outline';
 import useNearbyFruits from '@/hooks/useNearbyFruits';
 import useSpecificFruit from '@/hooks/useSpecificFruit';
-import useLocationReviews from '@/hooks/useLocationReviews';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Fruit, FruitLocation } from '@/types';
 import fruitIcon from '@/utils/fruitIcon';
@@ -42,8 +41,6 @@ export default function FruitMap({ token, requestParams }) {
   const [selectedFruit, setSelectedFruit] = useSpecificFruit(
     initialState ? Number(requestParams.data) : 1,
   );
-  const [selectedReviews, avgRating, reviewCount, setSelectedReviews] =
-    useLocationReviews(initialState ? Number(requestParams.data) : 1);
   const [openPanel, setOpenPanel] = useState(initialState ? true : false);
   const [selectedLocation, setSelectedLocation] = useState(0);
   const { width } = useWindowWidth();
@@ -89,16 +86,8 @@ export default function FruitMap({ token, requestParams }) {
 
   const panelLoad = async (id: number) => {
     setSelectedFruit(id);
-    setSelectedReviews(id, forceRefresh);
     setSelectedLocation(id);
     setOpenPanel(true);
-  };
-
-  const refreshReviewData = () => {
-    setForceRefresh(!forceRefresh);
-    setTimeout(() => {
-      setSelectedReviews(selectedLocation, forceRefresh);
-    }, 0);
   };
 
   const retrieveSearch = (e: any) => {
@@ -263,10 +252,6 @@ export default function FruitMap({ token, requestParams }) {
         openPanel={openPanel && selectedFruit}
         setOpenPanel={setOpenPanel}
         selectedFruit={selectedFruit}
-        selectedReviews={selectedReviews}
-        avgRating={avgRating}
-        reviewCount={reviewCount}
-        refreshReviewData={refreshReviewData}
         selectedLocation={selectedLocation}
         setEditModalOpen={setEditModalOpen}
         setDeleteModalOpen={setDeleteModalOpen}
