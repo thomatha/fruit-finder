@@ -1,7 +1,6 @@
 import { Fruit } from '@/types';
+import { PutBlobResult } from '@vercel/blob';
 import { useState } from 'react';
-const AWS_BUCKET_NAME = 'fruitfinder';
-const AWS_REGION = 'us-east-2';
 
 // This is the hook return type
 type AddFruitData = [
@@ -36,34 +35,13 @@ export default function useAddFruit(): AddFruitData {
       if (file) {
         const response = await fetch('/api/images', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ filename: file.name, contentType: file.type }),
+          body: file,
         });
 
         if (response.ok) {
-          const { url, fields } = await response.json();
-
-          const formData = new FormData();
-          Object.entries(fields).forEach(([key, value]) => {
-            formData.append(key, value as string);
-          });
-          formData.append('file', file);
-
-          const uploadResponse = await fetch(url, {
-            method: 'POST',
-            headers: {
-              'Cache-Control': 'no-cache',
-            },
-            body: formData,
-          });
-
-          if (uploadResponse.ok) {
-            s3_img_link = `https://${AWS_BUCKET_NAME}.s3.${AWS_REGION}.amazonaws.com/${fields.key}`;
-          } else {
-            console.error('S3 Upload Error:', uploadResponse);
-          }
+          const newBlob = (await response.json()) as PutBlobResult;
+          s3_img_link = newBlob.url;
+          console.log(newBlob);
         } else {
           console.error('Failed to get pre-signed URL.');
         }

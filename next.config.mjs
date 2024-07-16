@@ -4,7 +4,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'fruitfinder.s3.us-east-2.amazonaws.com',
+        hostname: 'dredrihgdbdd9mca.public.blob.vercel-storage.com',
         port: '',
         pathname: '/**',
       },
